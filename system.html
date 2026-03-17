@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IDEX — Tài liệu kiến trúc hệ thống</title>
+<link rel="stylesheet" href="system.css">
+</head>
+<body>
+
+<div class="doc-wrapper">
+
+  <!-- ════ HEADER ════ -->
+  <div class="doc-header">
+    <div class="doc-logo">
+      <div class="doc-logo-icon">ID</div>
+      <div class="doc-title">IDEX</div>
+    </div>
+    <div class="doc-subtitle">System Architecture Documentation</div>
+    <div class="doc-version-badge">● VERSION 1.0.0 · POLYGON NETWORK · SINGLE-FILE APP</div>
+  </div>
+
+  <!-- ════ STATS STRIP ════ -->
+  <div class="stats-strip">
+    <div class="stat-box">
+      <div class="stat-val" style="color:var(--y)" id="stat-components">0</div>
+      <div class="stat-lbl">Modules chính</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-val" style="color:var(--mg)" id="stat-tx-max">0</div>
+      <div class="stat-lbl">TX tối đa / block</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-val" style="color:var(--b)" id="stat-security">0</div>
+      <div class="stat-lbl">Lớp bảo mật</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-val" style="color:var(--r)" id="stat-difficulty">0</div>
+      <div class="stat-lbl">PoW Difficulty</div>
+    </div>
+  </div>
+
+  <!-- ════ TOC ════ -->
+  <div class="toc">
+    <div class="toc-title">// Mục lục</div>
+    <ul class="toc-list">
+      <li><a href="#overview"><span class="toc-num">01</span> Tổng quan hệ thống</a></li>
+      <li><a href="#auth"><span class="toc-num">02</span> DID Authentication</a></li>
+      <li><a href="#exchange"><span class="toc-num">03</span> Exchange View</a></li>
+      <li><a href="#txflow"><span class="toc-num">04</span> Luồng giao dịch</a></li>
+      <li><a href="#mempool"><span class="toc-num">05</span> Mempool</a></li>
+      <li><a href="#merkle"><span class="toc-num">06</span> Merkle Tree</a></li>
+      <li><a href="#mining"><span class="toc-num">07</span> Mining Engine</a></li>
+      <li><a href="#blockchain"><span class="toc-num">08</span> Blockchain</a></li>
+      <li><a href="#datamodel"><span class="toc-num">09</span> Data Model</a></li>
+      <li><a href="#security"><span class="toc-num">10</span> Bảo mật đa lớp</a></li>
+    </ul>
+  </div>
+
+  <!-- ════ 01. TỔNG QUAN ════ -->
+  <div class="doc-section" id="overview">
+    <div class="section-header">
+      <div class="section-number">01</div>
+      <div class="section-title">TỔNG QUAN HỆ THỐNG</div>
+    </div>
+
+    <div class="section-desc">
+      IDEX là một ứng dụng mô phỏng sàn giao dịch blockchain tích hợp đầy đủ trong một file HTML duy nhất.
+      Hệ thống gồm 2 vai trò chính: <strong style="color:var(--y)">Exchange User</strong> (mua/bán)
+      và <strong style="color:var(--mg)">Miner</strong> (đào block xác nhận giao dịch), kết nối với nhau
+      qua một SharedState dùng chung.
+    </div>
+
+    <!-- Luồng chính -->
+    <div style="margin-bottom:8px"><div class="flow-label">// LUỒNG DỮ LIỆU CHÍNH</div></div>
+    <div class="flow-diagram">
+      <div class="flow-row" id="main-flow"></div>
+      <div style="margin-top:14px;font-family:var(--m);font-size:9px;color:var(--txt3)">
+        * Tất cả state được chia sẻ qua object <span style="color:var(--mg)">SharedState</span> — bridge trung tâm giữa Exchange và Miner
+      </div>
+    </div>
+
+    <!-- Component cards -->
+    <div class="card-grid" id="component-cards"></div>
+
+    <div class="callout info">
+      <div class="callout-icon">ℹ️</div>
+      <div class="callout-content">
+        <strong>Single-file architecture:</strong> Toàn bộ CSS, HTML, JavaScript (~2300 dòng) được đóng gói
+        trong một file duy nhất. Không cần server, không cần build tool — mở trực tiếp trên trình duyệt.
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ 02. DID AUTH ════ -->
+  <div class="doc-section" id="auth">
+    <div class="section-header">
+      <div class="section-number">02</div>
+      <div class="section-title">DID AUTHENTICATION</div>
+    </div>
+
+    <div class="section-desc">
+      Thay vì username/password truyền thống, IDEX dùng <strong style="color:var(--purple)">Decentralized Identifier (DID)</strong>
+      theo chuẩn W3C. Người dùng chứng minh quyền sở hữu danh tính bằng cách ký một challenge ngẫu nhiên
+      từ server bằng private key của mình.
+    </div>
+
+    <div class="card-grid-2">
+      <div>
+        <div class="flow-label" style="margin-bottom:10px">// 4 BƯỚC XÁC THỰC</div>
+        <div class="flow-diagram" style="padding:16px">
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="flow-node purple" style="min-width:100px;text-align:center">STEP 01</div>
+              <div style="font-size:11px;color:var(--txt2)">Nhập DID — Validate format <code style="color:var(--purple)">did:*:*</code></div>
+            </div>
+            <div style="padding-left:14px;color:var(--txt3);font-size:10px">↓</div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="flow-node blue" style="min-width:100px;text-align:center">STEP 02</div>
+              <div style="font-size:11px;color:var(--txt2)">Blockchain lookup — Lấy DID Document + Public Key</div>
+            </div>
+            <div style="padding-left:14px;color:var(--txt3);font-size:10px">↓</div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="flow-node yellow" style="min-width:100px;text-align:center">STEP 03</div>
+              <div style="font-size:11px;color:var(--txt2)">Sign Challenge — Ký chuỗi ngẫu nhiên bằng Private Key</div>
+            </div>
+            <div style="padding-left:14px;color:var(--txt3);font-size:10px">↓</div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="flow-node green" style="min-width:100px;text-align:center">STEP 04</div>
+              <div style="font-size:11px;color:var(--txt2)">Verify — Xác minh chữ ký với Public Key trên chain</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="flow-label" style="margin-bottom:10px">// CẤU TRÚC DID DOCUMENT</div>
+        <div class="code-block">
+<pre class="code-raw">
+{
+  "@context": "https://w3id.org/did/v1",
+  "id": "did:polygon:trader0xA3f9",
+  "verificationMethod": [{
+    "id": "did:polygon:trader0xA3f9#keys-1",
+    "type": "Ed25519VerificationKey2020",
+    "publicKeyMultibase": "z6Mkf5rGMoatr..."
+  }]
+}
+</pre>
+        </div>
+
+        <div class="callout warn">
+          <div class="callout-icon">⚠️</div>
+          <div class="callout-content">
+            <strong>Bảo mật challenge:</strong> Challenge được tạo ngẫu nhiên mỗi phiên
+            → không thể replay lại chữ ký cũ để giả mạo.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ 03. EXCHANGE ════ -->
+  <div class="doc-section" id="exchange">
+    <div class="section-header">
+      <div class="section-number">03</div>
+      <div class="section-title">EXCHANGE VIEW</div>
+    </div>
+
+    <div class="section-desc">
+      Giao diện sàn giao dịch theo phong cách Binance với đầy đủ: candlestick chart (canvas thuần),
+      order book realtime, form đặt lệnh Mua/Bán, danh sách lệnh mở và lịch sử khớp lệnh.
+    </div>
+
+    <div class="card-grid-3">
+      <div class="doc-card yellow">
+        <div class="card-icon">📈</div>
+        <div class="card-title">Candlestick Chart</div>
+        <div class="card-desc">Vẽ bằng Canvas API thuần. Tự động sinh nến mới mỗi ~6 giây. Hỗ trợ 6 khung thời gian: 1m, 5m, 15m, 1h, 4h, 1D.</div>
+        <span class="card-tag tag-y">Canvas API</span>
+      </div>
+      <div class="doc-card blue">
+        <div class="card-icon">📒</div>
+        <div class="card-title">Order Book</div>
+        <div class="card-desc">Hiển thị 12 cấp ask và 12 cấp bid với depth bar trực quan. Giá cập nhật realtime mỗi 900ms.</div>
+        <span class="card-tag tag-b">Realtime</span>
+      </div>
+      <div class="doc-card green">
+        <div class="card-icon">⚡</div>
+        <div class="card-title">Order Form</div>
+        <div class="card-desc">Hỗ trợ Limit / Market / Stop. Tính toán tự động tổng tiền, phí 0.1%. Ký SHA-256 trước khi gửi vào TX Queue.</div>
+        <span class="card-tag tag-mg">SHA-256 Signed</span>
+      </div>
+    </div>
+
+    <div class="callout success">
+      <div class="callout-icon">✅</div>
+      <div class="callout-content">
+        <strong>Kết nối với Miner:</strong> Khi đặt lệnh thành công, TX không vào Mempool ngay mà
+        vào <strong>"Panel Lựa chọn giao dịch"</strong> — người dùng chủ động chọn TX nào đưa vào block.
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ 04. TX FLOW ════ -->
+  <div class="doc-section" id="txflow">
+    <div class="section-header">
+      <div class="section-number">04</div>
+      <div class="section-title">LUỒNG GIAO DỊCH</div>
+    </div>
+
+    <div class="section-desc">
+      Giao dịch từ Exchange đi qua 2 giai đoạn trước khi được đào vào block.
+      Giao dịch thủ công từ Miner đi thẳng vào Mempool.
+    </div>
+
+    <div class="flow-diagram">
+      <div class="flow-label">// LUỒNG TX TỪ EXCHANGE</div>
+      <div class="flow-row" style="margin-bottom:12px">
+        <div class="flow-node yellow">Đặt lệnh<br><span style="font-size:8px;opacity:.7">Mua / Bán</span></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node purple">Ký SHA-256<br><span style="font-size:8px;opacity:.7">signature</span></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node green">TX Queue<br><span style="font-size:8px;opacity:.7">Chờ chọn</span></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node blue">Tick chọn<br><span style="font-size:8px;opacity:.7">max 5 TX</span></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node green">Mempool<br><span style="font-size:8px;opacity:.7">selected=true</span></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node yellow">Mining<br><span style="font-size:8px;opacity:.7">PoW</span></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node green">Blockchain ✓</div>
+      </div>
+
+      <div class="flow-label" style="margin-top:8px">// LUỒNG TX THỦ CÔNG (MINER)</div>
+      <div class="flow-row">
+        <div class="flow-node blue">Nhập TX<br><span style="font-size:8px;opacity:.7">Form thủ công</span></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node purple">Ký SHA-256</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node green">Mempool<br><span style="font-size:8px;opacity:.7">Trực tiếp</span></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node yellow">Mining</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node green">Blockchain ✓</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ 05. MEMPOOL ════ -->
+  <div class="doc-section" id="mempool">
+    <div class="section-header">
+      <div class="section-number">05</div>
+      <div class="section-title">MEMPOOL</div>
+    </div>
+
+    <div class="section-desc">
+      Mempool (Memory Pool) là vùng chứa tạm thời cho các giao dịch chờ được đào.
+      Trong IDEX, SharedState.mempool là mảng trung tâm được cả Exchange lẫn Miner truy cập.
+    </div>
+
+    <div class="card-grid-2">
+      <div class="doc-card blue">
+        <div class="card-title">Đặc điểm Mempool</div>
+        <div style="margin-top:10px;display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;gap:8px;font-size:11px;color:var(--txt2)">
+            <span style="color:var(--mg)">●</span> Tự động refill ngẫu nhiên mỗi 5 giây (nếu &lt; 12 TX)
+          </div>
+          <div style="display:flex;gap:8px;font-size:11px;color:var(--txt2)">
+            <span style="color:var(--mg)">●</span> TX có flag <code style="color:var(--b)">selected</code> → được đào vào block kế tiếp
+          </div>
+          <div style="display:flex;gap:8px;font-size:11px;color:var(--txt2)">
+            <span style="color:var(--mg)">●</span> TX có flag <code style="color:var(--y)">fromExchange</code> → đánh dấu nguồn gốc
+          </div>
+          <div style="display:flex;gap:8px;font-size:11px;color:var(--txt2)">
+            <span style="color:var(--mg)">●</span> Sau khi đào xong → TX được xóa khỏi mempool tự động
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="flow-label" style="margin-bottom:8px">// SHARED STATE OBJECT</div>
+        <div class="code-block">
+<pre class="code-raw">
+const SharedState = {
+  mempool: [],       // Tất cả TX đang chờ
+  blockchain: [],    // Các block đã xác nhận
+  balances: {
+    btc: 0.842,
+    usdt: 12450.00
+  },
+  // Reactive: notify listeners
+  addTx(tx) { ... },
+  removeTxs(ids) { ... },
+  addBlock(block) { ... }
+};
+</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ 06. MERKLE TREE ════ -->
+  <div class="doc-section" id="merkle">
+    <div class="section-header">
+      <div class="section-number">06</div>
+      <div class="section-title">MERKLE TREE</div>
+    </div>
+
+    <div class="section-desc">
+      Merkle Tree là cấu trúc dữ liệu dạng cây nhị phân hash. Mỗi lá là hash SHA-256 của một TX.
+      Các node cha là hash của 2 node con ghép lại. Root cuối cùng (Merkle Root) được lưu vào block header,
+      đại diện cho toàn bộ tập TX trong block.
+    </div>
+
+    <div class="card-grid-2">
+      <div>
+        <div class="flow-label" style="margin-bottom:10px">// MINH HỌA CẤU TRÚC</div>
+        <div class="merkle-visual" id="merkle-visual"></div>
+      </div>
+
+      <div>
+        <div class="flow-label" style="margin-bottom:10px">// THUẬT TOÁN TÍNH MERKLE ROOT</div>
+        <div class="code-block">
+<pre class="code-raw">
+async function computeMerkleRoot(txs) {
+  // Bước 1: Hash từng TX (lá)
+  let hashes = await Promise.all(
+    txs.map(t => sha256(JSON.stringify(t)))
+  );
+  // Bước 2: Gộp cặp lên đến ROOT
+  while (hashes.length > 1) {
+    if (hashes.length % 2)
+      hashes.push(hashes[hashes.length-1]);
+    const next = [];
+    for (let i=0; i<hashes.length; i+=2)
+      next.push(await sha256(hashes[i]+hashes[i+1]));
+    hashes = next;
+  }
+  return hashes[0]; // Merkle Root
+}
+</pre>
+        </div>
+
+        <div class="callout success">
+          <div class="callout-icon">✅</div>
+          <div class="callout-content">
+            <strong>Auto-compute:</strong> Merkle Tree trong IDEX được tính tự động từ
+            tất cả TX đã chọn vào block — không cần tick chọn thủ công.
+            Cập nhật realtime mỗi khi TX được thêm/bớt.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ 07. MINING ════ -->
+  <div class="doc-section" id="mining">
+    <div class="section-header">
+      <div class="section-number">07</div>
+      <div class="section-title">MINING ENGINE — PROOF OF WORK</div>
+    </div>
+
+    <div class="section-desc">
+      Mining là quá trình tìm giá trị <strong style="color:var(--y)">nonce</strong> sao cho
+      SHA-256 hash của block header bắt đầu bằng đúng 4 số 0 (difficulty = 4).
+      Mỗi lần thử là một lần hash — có thể cần hàng trăm nghìn lần thử.
+    </div>
+
+    <div class="flow-diagram">
+      <div class="flow-label">// QUY TRÌNH ĐÀO BLOCK</div>
+      <div class="flow-row">
+        <div class="flow-node green">Chọn TX<br><span style="font-size:8px;opacity:.7">từ Mempool</span></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node blue">Tính Merkle Root<br><span style="font-size:8px;opacity:.7">SHA-256 tree</span></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node yellow">Tạo Block Header<br><span style="font-size:8px;opacity:.7">nonce = 0</span></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node purple">Hash Block<br><span style="font-size:8px;opacity:.7">fastHash()</span></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node red">hash.startsWith<br><span style="font-size:8px;opacity:.7">"0000"?</span></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node green">✓ BLOCK FOUND<br><span style="font-size:8px;opacity:.7">+3.125 BTC</span></div>
+      </div>
+      <div style="margin-top:10px;font-family:var(--m);font-size:9px;color:var(--txt3)">
+        * Nếu không thoả → nonce++ → lặp lại. Chạy batch 300 lần/frame để không block UI.
+      </div>
+    </div>
+
+    <div class="card-grid-3" style="margin-top:16px">
+      <div class="doc-card yellow">
+        <div class="card-title">Fast Hash</div>
+        <div class="card-desc">Dùng FNV-1a cho vòng lặp mining (nhanh hơn Web Crypto ~100x). SHA-256 thật chỉ dùng khi finalize block.</div>
+        <span class="card-tag tag-y">FNV-1a</span>
+      </div>
+      <div class="doc-card green">
+        <div class="card-title">Block Reward</div>
+        <div class="card-desc">Mỗi block tìm được → Miner nhận 3.125 BTC (coinbase TX). Số dư cập nhật ngay vào SharedState.balances.</div>
+        <span class="card-tag tag-mg">3.125 BTC</span>
+      </div>
+      <div class="doc-card blue">
+        <div class="card-title">Batch Processing</div>
+        <div class="card-desc">Mỗi frame xử lý 300 nonce liên tiếp rồi yield cho trình duyệt via setTimeout(0) → UI vẫn responsive.</div>
+        <span class="card-tag tag-b">300 H/frame</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ 08. BLOCKCHAIN ════ -->
+  <div class="doc-section" id="blockchain">
+    <div class="section-header">
+      <div class="section-number">08</div>
+      <div class="section-title">BLOCKCHAIN</div>
+    </div>
+
+    <div class="section-desc">
+      Blockchain là danh sách các block được liên kết với nhau bằng hash.
+      Mỗi block chứa hash của block trước (previousHash), tạo thành chuỗi bất biến.
+      Sửa bất kỳ block nào sẽ làm vỡ toàn bộ chuỗi sau đó.
+    </div>
+
+    <div class="flow-diagram">
+      <div class="flow-row" style="flex-wrap:wrap;gap:0">
+        <div class="flow-node green" style="text-align:center;min-width:120px">
+          <div style="font-size:9px;opacity:.6;margin-bottom:2px">GENESIS BLOCK #0</div>
+          prevHash: 0000...0000<br>
+          <span style="color:var(--mg);font-size:9px">hash: 0000a3f9...</span>
+        </div>
+        <div class="flow-arrow" style="display:flex;flex-direction:column;align-items:center;font-size:9px;gap:2px">
+          →<br><span style="color:var(--txt3)">prevHash</span>
+        </div>
+        <div class="flow-node yellow" style="text-align:center;min-width:120px">
+          <div style="font-size:9px;opacity:.6;margin-bottom:2px">BLOCK #1</div>
+          prevHash: 0000a3f9...<br>
+          <span style="color:var(--y);font-size:9px">hash: 0000b4e8...</span>
+        </div>
+        <div class="flow-arrow" style="display:flex;flex-direction:column;align-items:center;font-size:9px;gap:2px">
+          →<br><span style="color:var(--txt3)">prevHash</span>
+        </div>
+        <div class="flow-node blue" style="text-align:center;min-width:120px">
+          <div style="font-size:9px;opacity:.6;margin-bottom:2px">BLOCK #2</div>
+          prevHash: 0000b4e8...<br>
+          <span style="color:var(--b);font-size:9px">hash: 0000c5f7...</span>
+        </div>
+        <div class="flow-arrow" style="display:flex;flex-direction:column;align-items:center;font-size:9px;gap:2px">
+          →<br><span style="color:var(--txt3)">prevHash</span>
+        </div>
+        <div class="flow-node purple" style="text-align:center;min-width:120px">
+          <div style="font-size:9px;opacity:.6;margin-bottom:2px">BLOCK #N (NEW)</div>
+          prevHash: 0000c5f7...<br>
+          <span style="color:var(--purple);font-size:9px">hash: đang tính...</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ 09. DATA MODEL ════ -->
+  <div class="doc-section" id="datamodel">
+    <div class="section-header">
+      <div class="section-number">09</div>
+      <div class="section-title">DATA MODEL</div>
+    </div>
+
+    <div class="section-desc">Cấu trúc dữ liệu của Block và Transaction trong hệ thống IDEX.</div>
+
+    <div style="margin-bottom:8px"><div class="flow-label">// BLOCK OBJECT</div></div>
+    <table class="doc-table">
+      <thead>
+        <tr>
+          <th>Field</th>
+          <th>Type</th>
+          <th>Mô tả</th>
+          <th>Ví dụ</th>
+        </tr>
+      </thead>
+      <tbody id="block-table-body"></tbody>
+    </table>
+
+    <div style="margin-bottom:8px;margin-top:20px"><div class="flow-label">// TRANSACTION OBJECT</div></div>
+    <table class="doc-table">
+      <thead>
+        <tr>
+          <th>Field</th>
+          <th>Type</th>
+          <th>Mô tả</th>
+          <th>Ví dụ</th>
+        </tr>
+      </thead>
+      <tbody id="tx-table-body"></tbody>
+    </table>
+  </div>
+
+  <!-- ════ 10. SECURITY ════ -->
+  <div class="doc-section" id="security">
+    <div class="section-header">
+      <div class="section-number">10</div>
+      <div class="section-title">BẢO MẬT ĐA LỚP</div>
+    </div>
+
+    <div class="section-desc">
+      IDEX mô phỏng 5 lớp bảo mật độc lập, bổ sung cho nhau. Mỗi lớp bảo vệ một khía cạnh khác nhau
+      của hệ thống — từ xác thực danh tính đến tính toàn vẹn của chuỗi block.
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:10px" id="security-cards"></div>
+
+    <div class="callout info" style="margin-top:16px">
+      <div class="callout-icon">ℹ️</div>
+      <div class="callout-content">
+        <strong>Lưu ý:</strong> Đây là ứng dụng mô phỏng giáo dục. SHA-256 được thực hiện
+        qua <code style="color:var(--b)">Web Crypto API</code> thật, nhưng private key, DID Document
+        và Polygon blockchain chỉ được giả lập — không kết nối mạng thật.
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ FOOTER ════ -->
+  <div class="doc-footer">
+    <div>
+      <span style="color:var(--y);font-family:var(--h);font-size:11px">IDEX</span>
+      <span style="margin-left:8px">System Documentation · v1.0.0</span>
+    </div>
+    <div>Exchange + Blockchain · Polygon Network Simulation</div>
+  </div>
+
+</div><!-- /doc-wrapper -->
+
+<script src="system.js"></script>
+</body>
+</html>

@@ -1,0 +1,5460 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>IDEX — Exchange + Blockchain</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Orbitron:wght@700;900&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      :root {
+        /* shared */
+        --bg0: #090d12;
+        --bg1: #0f151c;
+        --bg2: #141c25;
+        --bg3: #1a242f;
+        --bg4: #22303d;
+        --line: rgba(255, 255, 255, 0.06);
+        --line2: rgba(255, 255, 255, 0.12);
+        --txt: #dde8f0;
+        --txt2: #6e8a9a;
+        --txt3: #3d5566;
+        /* exchange accent */
+        --y: #f0b90b;
+        --yd: rgba(240, 185, 11, 0.12);
+        --g: #0ecb81;
+        --gd: rgba(14, 203, 129, 0.1);
+        --r: #f6465d;
+        --rd: rgba(246, 70, 93, 0.1);
+        --b: #1e9cd7;
+        /* miner accent */
+        --mg: #00c87a;
+        --mgd: rgba(0, 200, 122, 0.1);
+        --mglow: rgba(0, 200, 122, 0.3);
+        --f: "IBM Plex Sans", sans-serif;
+        --m: "IBM Plex Mono", monospace;
+        --h: "Orbitron", sans-serif;
+      }
+      html,
+      body {
+        height: 100%;
+        background: var(--bg0);
+        color: var(--txt);
+        font-family: var(--f);
+        font-size: 12px;
+        overflow: hidden;
+      }
+      ::-webkit-scrollbar {
+        width: 3px;
+        height: 3px;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: var(--bg4);
+      }
+
+      /* ══ TOP SWITCHER ══ */
+      .app-bar {
+        height: 48px;
+        background: var(--bg1);
+        border-bottom: 1px solid var(--line2);
+        display: flex;
+        align-items: center;
+        padding: 0 16px;
+        gap: 0;
+        position: relative;
+        z-index: 200;
+        flex-shrink: 0;
+      }
+      .app-logo {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-right: 20px;
+      }
+      .app-logo svg {
+        width: 26px;
+        height: 26px;
+      }
+      .app-logo-txt {
+        font-family: var(--h);
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--y);
+        letter-spacing: 1px;
+      }
+
+      /* VIEW TABS */
+      .view-tabs {
+        display: flex;
+        height: 100%;
+        gap: 0;
+      }
+      .view-tab {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        padding: 0 20px;
+        height: 100%;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--txt2);
+        cursor: pointer;
+        border-bottom: 2px solid transparent;
+        transition: all 0.15s;
+        letter-spacing: 0.3px;
+        position: relative;
+      }
+      .view-tab:hover {
+        color: var(--txt);
+      }
+      .view-tab.active-exchange {
+        color: var(--y);
+        border-bottom-color: var(--y);
+      }
+      .view-tab.active-miner {
+        color: var(--mg);
+        border-bottom-color: var(--mg);
+      }
+      .view-tab svg {
+        width: 14px;
+        height: 14px;
+      }
+
+      /* TX PIPE INDICATOR */
+      .pipe-indicator {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin: 0 16px;
+        padding: 4px 12px;
+        background: var(--bg2);
+        border: 1px solid var(--line2);
+        font-family: var(--m);
+        font-size: 10px;
+        color: var(--txt2);
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .pipe-indicator:hover {
+        border-color: var(--mg);
+        color: var(--mg);
+      }
+      .pipe-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--mg);
+        box-shadow: 0 0 6px var(--mg);
+        animation: pdot 1.5s infinite;
+      }
+      @keyframes pdot {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.3;
+        }
+      }
+      .pipe-count {
+        background: var(--y);
+        color: #000;
+        border-radius: 1px;
+        padding: 1px 5px;
+        font-weight: 700;
+        font-size: 9px;
+        min-width: 16px;
+        text-align: center;
+      }
+      .pipe-count.zero {
+        background: var(--bg4);
+        color: var(--txt3);
+      }
+
+      .app-bar-right {
+        margin-left: auto;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .status-chip {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-family: var(--m);
+        font-size: 10px;
+        background: var(--bg2);
+        border: 1px solid var(--line);
+        padding: 4px 10px;
+        color: var(--txt2);
+      }
+      .status-dot {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: var(--mg);
+        box-shadow: 0 0 5px var(--mg);
+        animation: pdot 1.5s infinite;
+      }
+
+      /* DID chip */
+      .did-chip {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        background: var(--bg2);
+        border: 1px solid var(--line2);
+        padding: 4px 12px 4px 5px;
+        cursor: pointer;
+        transition: border-color 0.15s;
+      }
+      .did-chip:hover {
+        border-color: var(--line2);
+      }
+      .did-av {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--y), #c88000);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 11px;
+        color: #000;
+      }
+      .did-name-txt {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--txt);
+        line-height: 1;
+      }
+      .did-addr-txt {
+        font-family: var(--m);
+        font-size: 9px;
+        color: var(--txt2);
+        line-height: 1;
+      }
+      .did-verified {
+        font-family: var(--m);
+        font-size: 8px;
+        color: var(--mg);
+        background: var(--mgd);
+        border: 1px solid rgba(0, 200, 122, 0.2);
+        padding: 1px 5px;
+      }
+
+      /* ══ VIEWS ══ */
+      .view {
+        display: none;
+        flex: 1;
+        overflow: hidden;
+        flex-direction: column;
+      }
+      .view.active {
+        display: flex;
+      }
+
+      /* ════════════════════════════════
+   EXCHANGE VIEW
+════════════════════════════════ */
+      .ex-pairbar {
+        height: 52px;
+        background: var(--bg1);
+        border-bottom: 1px solid var(--line);
+        display: flex;
+        align-items: center;
+        padding: 0 16px;
+        gap: 28px;
+        flex-shrink: 0;
+        overflow-x: auto;
+      }
+      .pair-badge {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-shrink: 0;
+      }
+      .pair-icons-wrap {
+        position: relative;
+        width: 34px;
+        height: 20px;
+      }
+      .ci {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 9px;
+        font-weight: 700;
+        position: absolute;
+      }
+      .ci.a {
+        background: #f7931a;
+        color: #fff;
+        left: 0;
+        top: 0;
+        z-index: 2;
+      }
+      .ci.b {
+        background: var(--bg3);
+        color: var(--txt2);
+        right: 0;
+        top: 0;
+        z-index: 1;
+        border: 1px solid var(--line2);
+      }
+      .pb-name {
+        font-size: 15px;
+        font-weight: 700;
+      }
+      .pb-sub {
+        font-size: 10px;
+        color: var(--txt3);
+      }
+      .pb-div {
+        width: 1px;
+        height: 26px;
+        background: var(--line);
+        flex-shrink: 0;
+      }
+      .pb-stat {
+        flex-shrink: 0;
+      }
+      .pb-val {
+        font-family: var(--m);
+        font-size: 13px;
+        font-weight: 600;
+      }
+      .pb-val.g {
+        color: var(--g);
+      }
+      .pb-val.r {
+        color: var(--r);
+      }
+      .pb-lbl {
+        font-size: 9px;
+        color: var(--txt3);
+      }
+
+      .ex-layout {
+        flex: 1;
+        display: grid;
+        grid-template-columns: 200px 1fr 250px 270px;
+        overflow: hidden;
+        min-height: 0;
+      }
+
+      /* ── Pair list ── */
+      .ex-pairs {
+        background: var(--bg1);
+        border-right: 1px solid var(--line);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+      .ex-pairs-tabs {
+        display: flex;
+        border-bottom: 1px solid var(--line);
+        padding: 0 6px;
+      }
+      .ept {
+        padding: 7px 8px;
+        font-size: 11px;
+        font-weight: 500;
+        color: var(--txt3);
+        cursor: pointer;
+        border-bottom: 2px solid transparent;
+        transition: all 0.15s;
+      }
+      .ept.on {
+        color: var(--y);
+        border-bottom-color: var(--y);
+      }
+      .ept:hover {
+        color: var(--txt);
+      }
+      .pairs-search-wrap {
+        padding: 6px;
+        flex-shrink: 0;
+      }
+      .pair-search-inp {
+        width: 100%;
+        background: var(--bg2);
+        border: 1px solid var(--line);
+        color: var(--txt);
+        font-family: var(--f);
+        font-size: 11px;
+        padding: 5px 8px;
+        outline: none;
+      }
+      .pair-search-inp:focus {
+        border-color: var(--y);
+      }
+      .pair-search-inp::placeholder {
+        color: var(--txt3);
+      }
+      .pairs-col-hdr {
+        display: grid;
+        grid-template-columns: 1fr 70px 46px;
+        padding: 3px 8px;
+        font-size: 9px;
+        color: var(--txt3);
+        border-bottom: 1px solid var(--line);
+        flex-shrink: 0;
+      }
+      .pairs-scr {
+        overflow-y: auto;
+        flex: 1;
+      }
+      .prow {
+        display: grid;
+        grid-template-columns: 1fr 70px 46px;
+        padding: 5px 8px;
+        cursor: pointer;
+        transition: background 0.1s;
+        align-items: center;
+      }
+      .prow:hover {
+        background: var(--bg2);
+      }
+      .prow.on {
+        background: var(--bg2);
+      }
+      .pr-n {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--txt);
+      }
+      .pr-b {
+        font-size: 9px;
+        color: var(--txt3);
+      }
+      .pr-p {
+        font-family: var(--m);
+        font-size: 10px;
+        color: var(--txt);
+        text-align: right;
+      }
+      .pr-c {
+        font-family: var(--m);
+        font-size: 10px;
+        text-align: right;
+      }
+      .pr-c.up {
+        color: var(--g);
+      }
+      .pr-c.dn {
+        color: var(--r);
+      }
+
+      /* ── Chart ── */
+      .ex-chart {
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        border-right: 1px solid var(--line);
+      }
+      .chart-toolbar {
+        height: 34px;
+        background: var(--bg1);
+        border-bottom: 1px solid var(--line);
+        display: flex;
+        align-items: center;
+        padding: 0 12px;
+        gap: 0;
+        flex-shrink: 0;
+      }
+      .tb-btn {
+        padding: 3px 8px;
+        font-size: 11px;
+        color: var(--txt3);
+        cursor: pointer;
+        border-radius: 2px;
+        transition: all 0.1s;
+      }
+      .tb-btn:hover {
+        color: var(--txt);
+        background: var(--bg2);
+      }
+      .tb-btn.on {
+        color: var(--y);
+        background: var(--bg2);
+      }
+      .tb-sep {
+        width: 1px;
+        height: 16px;
+        background: var(--line);
+        margin: 0 4px;
+      }
+      .chart-wrap {
+        flex: 1;
+        position: relative;
+        overflow: hidden;
+      }
+      canvas#exchart {
+        display: block;
+      }
+      .recent-trades-panel {
+        height: 150px;
+        background: var(--bg1);
+        border-top: 1px solid var(--line);
+        display: flex;
+        flex-direction: column;
+        flex-shrink: 0;
+      }
+      .panel-hdr {
+        padding: 6px 12px;
+        font-size: 11px;
+        font-weight: 600;
+        border-bottom: 1px solid var(--line);
+        flex-shrink: 0;
+        color: var(--txt);
+      }
+      .trades-col-hdr {
+        display: grid;
+        grid-template-columns: 90px 80px 1fr;
+        padding: 3px 12px;
+        font-size: 9px;
+        color: var(--txt3);
+        flex-shrink: 0;
+      }
+      .trades-scr {
+        overflow-y: auto;
+        flex: 1;
+      }
+      .trow {
+        display: grid;
+        grid-template-columns: 90px 80px 1fr;
+        padding: 2px 12px;
+        font-family: var(--m);
+        font-size: 10px;
+      }
+      .trow:hover {
+        background: var(--bg2);
+      }
+      .trow .tp.buy {
+        color: var(--g);
+      }
+      .trow .tp.sell {
+        color: var(--r);
+      }
+      .trow .tq {
+        color: var(--txt2);
+        text-align: right;
+      }
+      .trow .tt {
+        color: var(--txt3);
+        text-align: right;
+      }
+
+      /* ── Order Book ── */
+      .ex-book {
+        background: var(--bg1);
+        border-right: 1px solid var(--line);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+      .book-col-hdr {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        padding: 5px 12px;
+        font-size: 9px;
+        color: var(--txt3);
+        flex-shrink: 0;
+      }
+      .book-col-hdr span:nth-child(2) {
+        text-align: right;
+      }
+      .book-col-hdr span:last-child {
+        text-align: right;
+      }
+      .book-asks,
+      .book-bids {
+        flex: 1;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+      .book-asks {
+        flex-direction: column-reverse;
+      }
+      .brow {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        padding: 1.5px 12px;
+        cursor: pointer;
+        position: relative;
+        align-items: center;
+        min-height: 17px;
+      }
+      .brow:hover {
+        filter: brightness(1.25);
+      }
+      .brow-bg {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        right: 0;
+        pointer-events: none;
+        opacity: 0.13;
+      }
+      .brow.ask .brow-bg {
+        background: var(--r);
+      }
+      .brow.bid .brow-bg {
+        background: var(--g);
+      }
+      .brow-price {
+        font-family: var(--m);
+        font-size: 11px;
+        font-weight: 500;
+        z-index: 1;
+      }
+      .brow.ask .brow-price {
+        color: var(--r);
+      }
+      .brow.bid .brow-price {
+        color: var(--g);
+      }
+      .brow-qty,
+      .brow-total {
+        font-family: var(--m);
+        font-size: 10px;
+        color: var(--txt2);
+        text-align: right;
+        z-index: 1;
+      }
+      .spread-mid {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 4px 12px;
+        border-top: 1px solid var(--line);
+        border-bottom: 1px solid var(--line);
+        flex-shrink: 0;
+      }
+      .spread-price {
+        font-family: var(--m);
+        font-size: 15px;
+        font-weight: 700;
+      }
+      .spread-price.up {
+        color: var(--g);
+      }
+      .spread-price.dn {
+        color: var(--r);
+      }
+
+      /* ── Order Form ── */
+      .ex-form {
+        background: var(--bg1);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+      .bal-panel {
+        background: var(--bg2);
+        border-bottom: 1px solid var(--line);
+        padding: 10px 12px;
+        flex-shrink: 0;
+      }
+      .bal-title {
+        font-size: 11px;
+        font-weight: 600;
+        margin-bottom: 7px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .bal-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 4px;
+      }
+      .bal-row:last-child {
+        margin-bottom: 0;
+        padding-top: 6px;
+        border-top: 1px solid var(--line);
+      }
+      .bal-coin-wrap {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+      .bal-dot {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 7px;
+        font-weight: 700;
+      }
+      .bd-btc {
+        background: #f7931a;
+        color: #fff;
+      }
+      .bd-usdt {
+        background: #26a17b;
+        color: #fff;
+      }
+      .bal-name-s {
+        font-size: 11px;
+        color: var(--txt2);
+      }
+      .bal-amt {
+        font-family: var(--m);
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--txt);
+      }
+      .bal-sub {
+        font-family: var(--m);
+        font-size: 9px;
+        color: var(--txt3);
+      }
+
+      .order-tabs {
+        display: flex;
+        border-bottom: 1px solid var(--line);
+        flex-shrink: 0;
+      }
+      .otab {
+        flex: 1;
+        text-align: center;
+        padding: 8px 4px;
+        font-size: 11px;
+        font-weight: 500;
+        color: var(--txt3);
+        cursor: pointer;
+        border-bottom: 2px solid transparent;
+        transition: all 0.15s;
+      }
+      .otab.on {
+        color: var(--txt);
+        border-bottom-color: var(--y);
+      }
+      .otab:hover {
+        color: var(--txt2);
+      }
+
+      .form-inner {
+        padding: 10px 12px;
+        overflow-y: auto;
+        flex: 1;
+      }
+      .bs-tabs {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4px;
+        margin-bottom: 10px;
+      }
+      .bstab {
+        padding: 7px;
+        text-align: center;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+        border-radius: 1px;
+        transition: all 0.15s;
+      }
+      .bstab.buy {
+        background: var(--g);
+        color: #fff;
+      }
+      .bstab.sell {
+        background: var(--r);
+        color: #fff;
+      }
+      .bstab.buy.off {
+        background: var(--gd);
+        color: var(--g);
+      }
+      .bstab.sell.off {
+        background: var(--rd);
+        color: var(--r);
+      }
+
+      .avail-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+      }
+      .avail-lbl {
+        font-size: 10px;
+        color: var(--txt3);
+      }
+      .avail-val {
+        font-family: var(--m);
+        font-size: 10px;
+      }
+
+      .inp-grp {
+        margin-bottom: 8px;
+        margin-top: 14px;
+        position: relative;
+      }
+      .inp-lbl {
+        font-size: 9px;
+        color: var(--txt3);
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        position: absolute;
+        top: -12px;
+        left: 0;
+      }
+      .inp-wrap {
+        display: flex;
+        align-items: center;
+        background: var(--bg2);
+        border: 1px solid var(--line);
+        transition: border-color 0.15s;
+      }
+      .inp-wrap:focus-within {
+        border-color: var(--y);
+      }
+      .inp-field {
+        flex: 1;
+        background: transparent;
+        border: none;
+        color: var(--txt);
+        font-family: var(--m);
+        font-size: 12px;
+        padding: 7px 10px;
+        outline: none;
+        width: 0;
+      }
+      .inp-field::placeholder {
+        color: var(--txt3);
+      }
+      .inp-unit {
+        padding: 0 10px;
+        font-size: 10px;
+        color: var(--txt3);
+        border-left: 1px solid var(--line);
+        white-space: nowrap;
+      }
+      .inp-btn-grp {
+        display: flex;
+        border-left: 1px solid var(--line);
+      }
+      .inp-pm {
+        width: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--txt3);
+        cursor: pointer;
+        font-size: 14px;
+        padding: 4px 0;
+        transition: all 0.1s;
+      }
+      .inp-pm:hover {
+        color: var(--txt);
+        background: var(--bg3);
+      }
+
+      .pct-row {
+        display: flex;
+        gap: 4px;
+        margin: 8px 0;
+      }
+      .pct-b {
+        flex: 1;
+        padding: 3px;
+        text-align: center;
+        font-size: 9px;
+        color: var(--txt3);
+        border: 1px solid var(--line2);
+        cursor: pointer;
+        border-radius: 1px;
+        transition: all 0.1s;
+      }
+      .pct-b:hover,
+      .pct-b.on {
+        border-color: var(--y);
+        color: var(--y);
+        background: var(--yd);
+      }
+
+      .order-sum {
+        background: var(--bg2);
+        border: 1px solid var(--line);
+        padding: 8px 10px;
+        margin: 10px 0;
+      }
+      .sum-r {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 4px;
+        font-size: 10px;
+      }
+      .sum-r:last-child {
+        margin-bottom: 0;
+      }
+      .sum-k {
+        color: var(--txt3);
+      }
+      .sum-v {
+        font-family: var(--m);
+        color: var(--txt2);
+      }
+
+      .btn-place {
+        width: 100%;
+        padding: 10px;
+        border: none;
+        font-family: var(--f);
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%);
+        transition: filter 0.15s;
+      }
+      .btn-place:hover {
+        filter: brightness(1.1);
+      }
+      .btn-place.buy {
+        background: var(--g);
+        color: #fff;
+      }
+      .btn-place.sell {
+        background: var(--r);
+        color: #fff;
+      }
+
+      /* MEMPOOL BADGE on order btn */
+      .btn-place .going-to-mempool {
+        font-size: 9px;
+        display: block;
+        opacity: 0.8;
+        margin-top: 2px;
+      }
+
+      /* ── Pending indicator when TX sent to miner ── */
+      .tx-sent-banner {
+        display: none;
+        position: fixed;
+        top: 56px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 500;
+        background: var(--bg1);
+        border: 1px solid var(--mg);
+        padding: 8px 20px;
+        font-family: var(--m);
+        font-size: 11px;
+        color: var(--mg);
+        box-shadow: 0 4px 30px var(--mglow);
+        animation: banner-in 0.3s ease;
+      }
+      @keyframes banner-in {
+        from {
+          transform: translateX(-50%) translateY(-10px);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(-50%) translateY(0);
+          opacity: 1;
+        }
+      }
+
+      /* bottom orders panel */
+      .ex-bottom {
+        height: 170px;
+        background: var(--bg1);
+        border-top: 1px solid var(--line);
+        display: flex;
+        flex-direction: column;
+        flex-shrink: 0;
+      }
+      .ex-btabs {
+        display: flex;
+        border-bottom: 1px solid var(--line);
+        padding: 0 16px;
+      }
+      .ebtab {
+        padding: 7px 12px;
+        font-size: 11px;
+        color: var(--txt3);
+        cursor: pointer;
+        border-bottom: 2px solid transparent;
+        transition: all 0.15s;
+        white-space: nowrap;
+      }
+      .ebtab.on {
+        color: var(--txt);
+        border-bottom-color: var(--y);
+      }
+      .orders-tbl {
+        flex: 1;
+        overflow-y: auto;
+      }
+      .otbl-hdr,
+      .otbl-row {
+        display: grid;
+        grid-template-columns: 120px 60px 80px 90px 90px 90px 90px 1fr;
+        padding: 4px 16px;
+        align-items: center;
+        min-width: 700px;
+      }
+      .otbl-hdr {
+        font-size: 9px;
+        color: var(--txt3);
+        border-bottom: 1px solid var(--line);
+        flex-shrink: 0;
+      }
+      .otbl-row {
+        font-size: 10px;
+        cursor: pointer;
+        transition: background 0.1s;
+      }
+      .otbl-row:hover {
+        background: var(--bg2);
+      }
+      .os-buy {
+        color: var(--g);
+        font-weight: 600;
+      }
+      .os-sell {
+        color: var(--r);
+        font-weight: 600;
+      }
+      .cancel-link {
+        color: var(--b);
+        cursor: pointer;
+        font-size: 10px;
+      }
+      .cancel-link:hover {
+        text-decoration: underline;
+      }
+      .empty-row {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 70px;
+        color: var(--txt3);
+        font-size: 11px;
+      }
+
+      /* ════════════════════════════════
+   MINER VIEW
+════════════════════════════════ */
+      .mn-layout {
+        flex: 1;
+        display: grid;
+        grid-template-columns: 240px 1fr 300px;
+        overflow: hidden;
+        min-height: 0;
+      }
+      /* miner grid bg */
+      .mn-layout::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 0;
+        background-image:
+          linear-gradient(rgba(0, 200, 122, 0.025) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(0, 200, 122, 0.025) 1px, transparent 1px);
+        background-size: 32px 32px;
+      }
+
+      .mn-sidebar,
+      .mn-center,
+      .mn-right {
+        position: relative;
+        z-index: 1;
+      }
+
+      /* ── Miner Sidebar ── */
+      .mn-sidebar {
+        background: var(--bg1);
+        border-right: 1px solid var(--line);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        min-height: 0;
+      }
+      .mn-sec {
+        padding: 12px 12px 0;
+        border-bottom: 1px solid var(--line);
+        padding-bottom: 12px;
+      }
+      .mn-sec-title {
+        font-family: var(--m);
+        font-size: 8px;
+        letter-spacing: 3px;
+        color: var(--txt3);
+        text-transform: uppercase;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .mn-sec-title::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: var(--line);
+      }
+
+      /* miner balance cards */
+      .mn-bal {
+        background: var(--bg2);
+        border: 1px solid var(--line);
+        padding: 10px;
+        margin-bottom: 6px;
+      }
+      .mn-bal:last-child {
+        margin-bottom: 0;
+      }
+      .mnb-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 4px;
+      }
+      .mnb-coin {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+      .mn-coin-dot {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 7px;
+        font-weight: 700;
+        flex-shrink: 0;
+      }
+      .mn-coin-dot.btc {
+        background: #f7931a;
+        color: #fff;
+      }
+      .mn-coin-dot.usdt {
+        background: #26a17b;
+        color: #fff;
+      }
+      .mnb-name {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--txt);
+      }
+      .mnb-chg {
+        font-family: var(--m);
+        font-size: 9px;
+      }
+      .mnb-chg.up {
+        color: var(--mg);
+      }
+      .mnb-chg.dn {
+        color: var(--r);
+      }
+      .mnb-amount {
+        font-family: var(--m);
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--txt);
+      }
+      .mnb-usd {
+        font-family: var(--m);
+        font-size: 9px;
+        color: var(--txt2);
+      }
+
+      /* miner stats grid */
+      .mn-stats-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 6px;
+      }
+      .mn-stat-card {
+        background: var(--bg2);
+        border: 1px solid var(--line);
+        padding: 8px;
+        text-align: center;
+      }
+      .mnsc-val {
+        font-family: var(--m);
+        font-size: 14px;
+        font-weight: 600;
+      }
+      .mnsc-lbl {
+        font-family: var(--m);
+        font-size: 8px;
+        color: var(--txt3);
+        letter-spacing: 1px;
+        margin-top: 1px;
+      }
+
+      /* MEMPOOL in miner */
+      .mn-mempool {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        padding: 0;
+      }
+      .mp-toolbar {
+        padding: 8px 12px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        border-bottom: 1px solid var(--line);
+        flex-shrink: 0;
+      }
+      .mp-toolbar-title {
+        font-family: var(--m);
+        font-size: 9px;
+        letter-spacing: 2px;
+        color: var(--txt3);
+        text-transform: uppercase;
+        flex: 1;
+      }
+      .mp-count-badge {
+        background: var(--y);
+        color: #000;
+        font-family: var(--m);
+        font-size: 9px;
+        font-weight: 700;
+        padding: 1px 6px;
+      }
+      .select-all-btn {
+        font-family: var(--m);
+        font-size: 9px;
+        color: var(--mg);
+        cursor: pointer;
+        border: 1px solid rgba(0, 200, 122, 0.2);
+        padding: 2px 7px;
+        transition: all 0.15s;
+      }
+      .select-all-btn:hover {
+        background: var(--mgd);
+      }
+
+      .mp-col-hdr {
+        display: grid;
+        grid-template-columns: 1fr 60px 44px;
+        padding: 3px 12px;
+        font-family: var(--m);
+        font-size: 8px;
+        color: var(--txt3);
+        border-bottom: 1px solid var(--line);
+        flex-shrink: 0;
+      }
+      .mp-list {
+        overflow-y: auto;
+        flex: 1;
+      }
+      .mp-item {
+        padding: 7px 12px;
+        background: transparent;
+        border-bottom: 1px solid var(--line);
+        cursor: pointer;
+        transition: background 0.1s;
+        display: grid;
+        grid-template-columns: 1fr 60px 44px;
+        gap: 4px;
+        align-items: center;
+        position: relative;
+      }
+      .mp-item:hover {
+        background: var(--bg2);
+      }
+      .mp-item.sel {
+        background: var(--mgd);
+        border-left: 2px solid var(--mg);
+      }
+      .mp-item.new-tx {
+        animation: mp-flash 0.6s ease;
+      }
+      @keyframes mp-flash {
+        0% {
+          background: rgba(0, 200, 122, 0.25);
+        }
+        100% {
+          background: transparent;
+        }
+      }
+      .mp-item.new-tx.sel {
+        animation: mp-flash-sel 0.6s ease;
+      }
+      @keyframes mp-flash-sel {
+        0% {
+          background: rgba(0, 200, 122, 0.45);
+        }
+        100% {
+          background: var(--mgd);
+        }
+      }
+
+      .mpi-id {
+        font-family: var(--m);
+        font-size: 10px;
+        color: var(--b);
+      }
+      .mpi-from {
+        font-family: var(--m);
+        font-size: 8px;
+        color: var(--txt3);
+      }
+      .mpi-type {
+        font-family: var(--m);
+        font-size: 8px;
+        padding: 1px 4px;
+        border-radius: 1px;
+        text-align: center;
+      }
+      .mpi-type.buy {
+        background: var(--gd);
+        color: var(--g);
+        border: 1px solid rgba(14, 203, 129, 0.2);
+      }
+      .mpi-type.send {
+        background: rgba(30, 156, 215, 0.08);
+        color: var(--b);
+        border: 1px solid rgba(30, 156, 215, 0.2);
+      }
+      .mpi-fee {
+        font-family: var(--m);
+        font-size: 9px;
+        color: var(--y);
+        text-align: right;
+      }
+      .mpi-amt {
+        font-family: var(--m);
+        font-size: 8px;
+        color: var(--txt2);
+        text-align: right;
+      }
+
+      /* FROM-EXCHANGE badge */
+      .from-exchange-tag {
+        font-family: var(--m);
+        font-size: 7px;
+        background: rgba(240, 185, 11, 0.12);
+        color: var(--y);
+        border: 1px solid rgba(240, 185, 11, 0.25);
+        padding: 1px 4px;
+        margin-left: 4px;
+        vertical-align: middle;
+      }
+
+      /* ══ TX SELECTION PANEL ══ */
+      .tx-select-panel {
+        border-bottom: 2px solid var(--y);
+        background: var(--bg1);
+        display: flex;
+        flex-direction: column;
+        flex-shrink: 0;
+        max-height: 260px;
+      }
+      .tx-select-header {
+        padding: 7px 12px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(240, 185, 11, 0.05);
+        border-bottom: 1px solid var(--line);
+        flex-shrink: 0;
+      }
+      .tx-select-title {
+        font-family: var(--m);
+        font-size: 8px;
+        letter-spacing: 2px;
+        color: var(--y);
+        text-transform: uppercase;
+        flex: 1;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .tx-select-title svg {
+        width: 10px;
+        height: 10px;
+      }
+      .tx-slot-counter {
+        font-family: var(--m);
+        font-size: 10px;
+        font-weight: 700;
+        background: var(--bg2);
+        border: 1px solid var(--line2);
+        padding: 2px 8px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+      .tx-slot-used {
+        color: var(--y);
+      }
+      .tx-slot-sep {
+        color: var(--txt3);
+      }
+      .tx-slot-max {
+        color: var(--txt3);
+      }
+      .tx-slot-counter.full .tx-slot-used {
+        color: var(--r);
+      }
+
+      .tx-slot-bars {
+        display: flex;
+        gap: 3px;
+        padding: 6px 12px 4px;
+        flex-shrink: 0;
+      }
+      .tx-slot-bar {
+        flex: 1;
+        height: 4px;
+        border-radius: 2px;
+        background: var(--bg3);
+        border: 1px solid var(--line);
+        transition: all 0.2s;
+      }
+      .tx-slot-bar.filled {
+        background: var(--y);
+        border-color: var(--y);
+        box-shadow: 0 0 5px rgba(240, 185, 11, 0.4);
+      }
+      .tx-slot-bar.filled.full {
+        background: var(--r);
+        border-color: var(--r);
+        box-shadow: 0 0 5px rgba(246, 70, 93, 0.4);
+      }
+
+      .tx-select-empty {
+        padding: 16px 12px;
+        text-align: center;
+        font-family: var(--m);
+        font-size: 9px;
+        color: var(--txt3);
+        line-height: 1.7;
+      }
+      .tx-select-list {
+        overflow-y: auto;
+        flex: 1;
+      }
+
+      .tx-sel-item {
+        display: grid;
+        grid-template-columns: 20px 1fr auto;
+        gap: 6px;
+        padding: 6px 10px;
+        border-bottom: 1px solid var(--line);
+        cursor: pointer;
+        transition: background 0.1s;
+        align-items: center;
+        position: relative;
+      }
+      .tx-sel-item:hover {
+        background: var(--bg2);
+      }
+      .tx-sel-item.checked {
+        background: rgba(240, 185, 11, 0.06);
+        border-left: 2px solid var(--y);
+      }
+      .tx-sel-item.disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+      .tx-sel-item.disabled:hover {
+        background: transparent;
+      }
+
+      .tx-sel-checkbox {
+        width: 14px;
+        height: 14px;
+        border: 1.5px solid var(--line2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 2px;
+        flex-shrink: 0;
+        transition: all 0.15s;
+      }
+      .tx-sel-item.checked .tx-sel-checkbox {
+        background: var(--y);
+        border-color: var(--y);
+      }
+      .tx-sel-checkbox svg {
+        display: none;
+        width: 9px;
+        height: 9px;
+      }
+      .tx-sel-item.checked .tx-sel-checkbox svg {
+        display: block;
+      }
+
+      .tx-sel-id {
+        font-family: var(--m);
+        font-size: 9px;
+        color: var(--b);
+      }
+      .tx-sel-meta {
+        font-family: var(--m);
+        font-size: 8px;
+        color: var(--txt3);
+        margin-top: 1px;
+      }
+      .tx-sel-right {
+        text-align: right;
+      }
+      .tx-sel-amt {
+        font-family: var(--m);
+        font-size: 10px;
+        font-weight: 600;
+        color: var(--txt);
+      }
+      .tx-sel-type {
+        font-family: var(--m);
+        font-size: 7px;
+        padding: 1px 4px;
+        border-radius: 1px;
+        margin-top: 2px;
+        display: inline-block;
+      }
+      .tx-sel-type.buy {
+        background: var(--gd);
+        color: var(--g);
+        border: 1px solid rgba(14, 203, 129, 0.2);
+      }
+      .tx-sel-type.send {
+        background: rgba(30, 156, 215, 0.08);
+        color: var(--b);
+        border: 1px solid rgba(30, 156, 215, 0.2);
+      }
+      .tx-sel-type.sell {
+        background: var(--rd);
+        color: var(--r);
+        border: 1px solid rgba(246, 70, 93, 0.2);
+      }
+
+      .tx-select-footer {
+        padding: 7px 10px;
+        border-top: 1px solid var(--line);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex-shrink: 0;
+      }
+      .btn-add-to-block {
+        flex: 1;
+        padding: 7px;
+        border: none;
+        background: var(--y);
+        color: #000;
+        font-family: var(--h);
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        cursor: pointer;
+        clip-path: polygon(5px 0, 100% 0, calc(100% - 5px) 100%, 0 100%);
+        transition: all 0.2s;
+      }
+      .btn-add-to-block:hover {
+        background: #ffd23f;
+        box-shadow: 0 0 14px rgba(240, 185, 11, 0.4);
+      }
+      .btn-add-to-block:disabled {
+        background: var(--bg3);
+        color: var(--txt3);
+        cursor: not-allowed;
+        box-shadow: none;
+      }
+      .btn-clear-sel {
+        padding: 7px 10px;
+        border: 1px solid var(--line2);
+        background: transparent;
+        color: var(--txt3);
+        font-family: var(--m);
+        font-size: 9px;
+        cursor: pointer;
+        transition: all 0.15s;
+      }
+      .btn-clear-sel:hover {
+        border-color: var(--r);
+        color: var(--r);
+      }
+
+      /* ── Miner Center ── */
+      .mn-center {
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        border-right: 1px solid var(--line);
+      }
+
+      .mining-engine-panel {
+        background: var(--bg1);
+        border-bottom: 1px solid var(--line);
+        padding: 14px 16px;
+        flex-shrink: 0;
+      }
+      .eng-title {
+        font-family: var(--h);
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--mg);
+        letter-spacing: 2px;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .eng-status {
+        font-family: var(--m);
+        font-size: 10px;
+        font-weight: 400;
+        letter-spacing: 1px;
+      }
+
+      .block-preview {
+        background: var(--bg2);
+        border: 1px solid var(--line2);
+        padding: 12px;
+        position: relative;
+        overflow: hidden;
+      }
+      .block-preview::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, var(--mg), transparent);
+        animation: scan-top 2s linear infinite;
+      }
+      @keyframes scan-top {
+        0% {
+          transform: translateX(-100%);
+        }
+        100% {
+          transform: translateX(100%);
+        }
+      }
+
+      .bp-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-bottom: 10px;
+      }
+      .bp-f {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+      .bp-lbl {
+        font-family: var(--m);
+        font-size: 8px;
+        color: var(--txt3);
+        letter-spacing: 2px;
+        text-transform: uppercase;
+      }
+      .bp-val {
+        font-family: var(--m);
+        font-size: 11px;
+        color: var(--txt);
+      }
+      .bp-val.nonce-v {
+        color: var(--y);
+        font-size: 15px;
+        font-weight: 600;
+      }
+      .bp-val.hash-v {
+        color: var(--b);
+        font-size: 9px;
+        word-break: break-all;
+      }
+      .bp-val.found-v {
+        color: var(--mg);
+        text-shadow: 0 0 10px var(--mglow);
+      }
+
+      .hash-output {
+        background: var(--bg0);
+        border: 1px solid var(--line);
+        padding: 8px 10px;
+        font-family: var(--m);
+        font-size: 10px;
+        word-break: break-all;
+        line-height: 1.6;
+        min-height: 42px;
+        margin-bottom: 8px;
+      }
+      .hz {
+        color: var(--mg);
+        text-shadow: 0 0 6px var(--mglow);
+      }
+      .hr {
+        color: var(--txt2);
+      }
+
+      .progress-track {
+        height: 5px;
+        background: var(--bg3);
+        border-radius: 3px;
+        overflow: hidden;
+        margin-bottom: 4px;
+      }
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--mg), #00ffaa);
+        border-radius: 3px;
+        box-shadow: 0 0 6px var(--mglow);
+        width: 0%;
+        transition: width 0.08s;
+      }
+      .progress-meta {
+        display: flex;
+        justify-content: space-between;
+        font-family: var(--m);
+        font-size: 8px;
+        color: var(--txt3);
+      }
+
+      .mine-btn-row {
+        display: flex;
+        gap: 8px;
+        margin-top: 10px;
+      }
+      .btn-mine {
+        flex: 1;
+        padding: 10px;
+        border: 1px solid var(--mg);
+        background: var(--mgd);
+        color: var(--mg);
+        font-family: var(--h);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        cursor: pointer;
+        transition: all 0.2s;
+        clip-path: polygon(7px 0, 100% 0, calc(100% - 7px) 100%, 0 100%);
+      }
+      .btn-mine:hover {
+        box-shadow: 0 0 16px var(--mglow);
+        background: rgba(0, 200, 122, 0.18);
+      }
+      .btn-mine.mining {
+        border-color: var(--y);
+        background: var(--yd);
+        color: var(--y);
+        animation: mpulse 0.5s ease-in-out infinite alternate;
+      }
+      @keyframes mpulse {
+        from {
+          box-shadow: 0 0 5px rgba(240, 185, 11, 0.3);
+        }
+        to {
+          box-shadow: 0 0 18px rgba(240, 185, 11, 0.6);
+        }
+      }
+      .btn-mine:disabled {
+        opacity: 0.35;
+        cursor: not-allowed;
+      }
+      .btn-stop-mine {
+        padding: 10px 14px;
+        border: 1px solid var(--r);
+        background: var(--rd);
+        color: var(--r);
+        font-family: var(--h);
+        font-size: 11px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: none;
+      }
+      .btn-stop-mine:hover {
+        box-shadow: 0 0 12px rgba(246, 70, 93, 0.3);
+      }
+
+      .mine-metrics {
+        display: flex;
+        gap: 14px;
+        margin-top: 8px;
+        padding-top: 8px;
+        border-top: 1px solid var(--line);
+      }
+      .mm-item {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+      .mm-val {
+        font-family: var(--m);
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--mg);
+      }
+      .mm-lbl {
+        font-family: var(--m);
+        font-size: 8px;
+        color: var(--txt3);
+        letter-spacing: 1px;
+      }
+
+      /* blockchain chain */
+      .chain-panel {
+        flex: 1;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+      .chain-hdr {
+        padding: 10px 16px 6px;
+        font-family: var(--m);
+        font-size: 8px;
+        letter-spacing: 3px;
+        color: var(--txt3);
+        text-transform: uppercase;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-shrink: 0;
+      }
+      .chain-hdr::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: var(--line);
+      }
+      .chain-scroll {
+        flex: 1;
+        overflow-y: auto;
+        padding: 0 16px 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+      }
+
+      /* block cards */
+      .bk-card {
+        background: var(--bg2);
+        border: 1px solid var(--line);
+        position: relative;
+        animation: bk-in 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      @keyframes bk-in {
+        from {
+          transform: translateY(-8px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+      .bk-card.genesis {
+        border-color: rgba(240, 185, 11, 0.3);
+        background: rgba(240, 185, 11, 0.03);
+      }
+      .bk-card.newest {
+        border-color: var(--mg);
+        background: var(--mgd);
+        box-shadow: 0 0 16px rgba(0, 200, 122, 0.12);
+      }
+      .bk-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, var(--mg), transparent);
+        opacity: 0.4;
+      }
+      .bk-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 12px;
+        border-bottom: 1px solid var(--line);
+        cursor: pointer;
+      }
+      .bkh-left {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .bk-num {
+        font-family: var(--h);
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--mg);
+      }
+      .bk-num.gen {
+        color: var(--y);
+      }
+      .bk-badge {
+        font-family: var(--m);
+        font-size: 7px;
+        padding: 1px 5px;
+        border-radius: 1px;
+      }
+      .bb-genesis {
+        background: var(--yd);
+        color: var(--y);
+        border: 1px solid rgba(240, 185, 11, 0.3);
+      }
+      .bb-new {
+        background: var(--mgd);
+        color: var(--mg);
+        border: 1px solid rgba(0, 200, 122, 0.3);
+      }
+      .bk-meta {
+        font-family: var(--m);
+        font-size: 9px;
+        color: var(--txt3);
+      }
+      .bk-tx-count {
+        font-family: var(--m);
+        font-size: 9px;
+        color: var(--mg);
+      }
+
+      .bk-body {
+        display: none;
+        padding: 8px 12px;
+        display: none;
+        grid-template-columns: 1fr 1fr;
+        gap: 6px;
+      }
+      .bk-body.open {
+        display: grid;
+      }
+      .bk-f {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+      .bk-fl {
+        font-family: var(--m);
+        font-size: 7px;
+        color: var(--txt3);
+        letter-spacing: 2px;
+        text-transform: uppercase;
+      }
+      .bk-fv {
+        font-family: var(--m);
+        font-size: 9px;
+        word-break: break-all;
+        line-height: 1.4;
+      }
+      .bk-fv.green {
+        color: var(--mg);
+      }
+      .bk-fv.blue {
+        color: var(--b);
+      }
+      .bk-fv.hash {
+        color: var(--b);
+        font-size: 8px;
+      }
+
+      .bk-txs {
+        display: none;
+        padding: 0 12px 8px;
+        border-top: 1px solid var(--line);
+      }
+      .bk-txs.open {
+        display: block;
+      }
+      .bk-tx-toggle {
+        font-family: var(--m);
+        font-size: 8px;
+        color: var(--txt3);
+        letter-spacing: 2px;
+        padding: 5px 0;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+      .bk-tx-toggle svg {
+        width: 9px;
+        height: 9px;
+        transition: transform 0.15s;
+      }
+      .bk-tx-toggle.open svg {
+        transform: rotate(90deg);
+      }
+      .bk-tx-rows {
+        display: none;
+      }
+      .bk-tx-rows.open {
+        display: block;
+      }
+      .bk-tx-hdr,
+      .bk-tx-row {
+        display: grid;
+        grid-template-columns: 70px 1fr 70px 50px;
+        gap: 4px;
+        font-family: var(--m);
+        font-size: 8px;
+        padding: 2px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+      }
+      .bk-tx-hdr {
+        color: var(--txt3);
+        border-bottom: 1px solid var(--line);
+      }
+      .bk-tx-row:last-child {
+        border-bottom: none;
+      }
+      .btxr-id {
+        color: var(--b);
+      }
+      .btxr-addr {
+        color: var(--txt3);
+      }
+      .btxr-amt {
+        color: var(--mg);
+        text-align: right;
+      }
+      .btxr-type {
+        text-align: center;
+        padding: 1px 3px;
+        border-radius: 1px;
+      }
+      .btxr-type.buy {
+        background: var(--gd);
+        color: var(--g);
+      }
+      .btxr-type.send {
+        background: rgba(30, 156, 215, 0.08);
+        color: var(--b);
+      }
+      .btxr-type.reward {
+        background: var(--yd);
+        color: var(--y);
+      }
+      /* from-exchange highlight */
+      .bk-tx-row.from-ex {
+        background: rgba(240, 185, 11, 0.04);
+        border-left: 2px solid rgba(240, 185, 11, 0.3);
+      }
+
+      .chain-link {
+        display: flex;
+        align-items: center;
+        padding: 3px 12px;
+        gap: 8px;
+        opacity: 0.5;
+      }
+      .cl-line {
+        flex: 1;
+        height: 1px;
+        background: linear-gradient(90deg, var(--line2), var(--line));
+      }
+      .cl-lbl {
+        font-family: var(--m);
+        font-size: 8px;
+        color: var(--txt3);
+      }
+
+      .chain-integrity {
+        padding: 5px 16px;
+        background: var(--bg1);
+        border-top: 1px solid var(--line);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-family: var(--m);
+        font-size: 9px;
+        flex-shrink: 0;
+      }
+      .ci-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--mg);
+        box-shadow: 0 0 6px var(--mg);
+      }
+      .ci-txt {
+        color: var(--txt2);
+      }
+      .ci-right {
+        margin-left: auto;
+        color: var(--txt3);
+      }
+
+      /* ── Miner Right ── */
+      .mn-right {
+        background: var(--bg1);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      .sec-panel {
+        padding: 12px;
+        border-bottom: 1px solid var(--line);
+        flex-shrink: 0;
+      }
+      .sec-layer-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 7px 10px;
+        background: var(--bg2);
+        border: 1px solid var(--line);
+        border-left: 2px solid var(--mg);
+        margin-bottom: 5px;
+      }
+      .sec-layer-item:last-child {
+        margin-bottom: 0;
+      }
+      .sli-icon {
+        font-size: 13px;
+        flex-shrink: 0;
+      }
+      .sli-info {
+        flex: 1;
+      }
+      .sli-name {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--txt);
+      }
+      .sli-desc {
+        font-family: var(--m);
+        font-size: 8px;
+        color: var(--txt2);
+        margin-top: 1px;
+      }
+      .sli-status {
+        font-family: var(--m);
+        font-size: 9px;
+        color: var(--mg);
+      }
+
+      .merkle-panel {
+        padding: 12px;
+        border-bottom: 1px solid var(--line);
+        flex-shrink: 0;
+      }
+      .merkle-box {
+        background: var(--bg2);
+        border: 1px solid var(--line);
+        padding: 10px;
+        min-height: 80px;
+      }
+      .mk-level {
+        display: flex;
+        justify-content: center;
+        gap: 6px;
+        margin-bottom: 6px;
+      }
+      .mk-node {
+        background: var(--bg3);
+        border: 1px solid var(--line);
+        padding: 3px 7px;
+        font-family: var(--m);
+        font-size: 8px;
+        color: var(--txt2);
+        min-width: 70px;
+        text-align: center;
+      }
+      .mk-node.root {
+        border-color: var(--mg);
+        color: var(--mg);
+        background: var(--mgd);
+      }
+      .mk-node.branch {
+        border-color: var(--b);
+        color: var(--b);
+        background: rgba(30, 156, 215, 0.05);
+      }
+      .mk-node.leaf {
+        background: rgba(240, 185, 11, 0.05);
+      }
+      .merkle-box.computing {
+        position: relative;
+        overflow: hidden;
+      }
+      .merkle-box.computing::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, var(--b), transparent);
+        animation: mk-scan 1s linear infinite;
+      }
+      @keyframes mk-scan {
+        0% {
+          transform: translateX(-100%);
+        }
+        100% {
+          transform: translateX(100%);
+        }
+      }
+      .mk-lbl {
+        font-size: 7px;
+        color: var(--txt3);
+        letter-spacing: 1px;
+        display: block;
+        margin-bottom: 1px;
+      }
+
+      /* TX quick-add form (miner side) */
+      .mn-tx-form {
+        padding: 12px;
+        flex: 1;
+        overflow-y: auto;
+      }
+      .mn-form-title {
+        font-family: var(--m);
+        font-size: 8px;
+        letter-spacing: 3px;
+        color: var(--txt3);
+        text-transform: uppercase;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .mn-form-title::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: var(--line);
+      }
+      .mf-group {
+        margin-bottom: 8px;
+      }
+      .mf-lbl {
+        font-family: var(--m);
+        font-size: 8px;
+        color: var(--txt3);
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        margin-bottom: 3px;
+      }
+      .mf-inp {
+        width: 100%;
+        background: var(--bg2);
+        border: 1px solid var(--line);
+        color: var(--txt);
+        font-family: var(--m);
+        font-size: 11px;
+        padding: 6px 8px;
+        outline: none;
+        transition: border-color 0.15s;
+      }
+      .mf-inp:focus {
+        border-color: var(--mg);
+      }
+      .mf-inp::placeholder {
+        color: var(--txt3);
+      }
+      .mf-select {
+        width: 100%;
+        background: var(--bg2);
+        border: 1px solid var(--line);
+        color: var(--txt);
+        font-family: var(--m);
+        font-size: 11px;
+        padding: 6px 8px;
+        outline: none;
+        cursor: pointer;
+      }
+      .mf-select option {
+        background: var(--bg2);
+      }
+      .mf-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 6px;
+      }
+      .sig-box {
+        background: var(--bg2);
+        border: 1px solid var(--line);
+        padding: 7px;
+        font-family: var(--m);
+        font-size: 8px;
+        color: var(--txt2);
+        word-break: break-all;
+        line-height: 1.6;
+        min-height: 44px;
+      }
+      .btn-mn-tx {
+        width: 100%;
+        padding: 9px;
+        border: none;
+        background: var(--mg);
+        color: #000;
+        font-family: var(--h);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        cursor: pointer;
+        clip-path: polygon(5px 0, 100% 0, calc(100% - 5px) 100%, 0 100%);
+        transition: all 0.2s;
+        margin-top: 4px;
+      }
+      .btn-mn-tx:hover {
+        background: #00ffaa;
+        box-shadow: 0 0 16px var(--mglow);
+      }
+
+      /* ── STATS FOOTER ── */
+      .stats-footer {
+        height: 34px;
+        background: var(--bg1);
+        border-top: 1px solid var(--line);
+        display: flex;
+        align-items: center;
+        padding: 0 16px;
+        gap: 28px;
+        flex-shrink: 0;
+        position: relative;
+        z-index: 10;
+        overflow: hidden;
+      }
+      .sf-item {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        flex-shrink: 0;
+      }
+      .sf-lbl {
+        font-family: var(--m);
+        font-size: 8px;
+        color: var(--txt3);
+        letter-spacing: 1px;
+      }
+      .sf-val {
+        font-family: var(--m);
+        font-size: 9px;
+        color: var(--txt);
+      }
+      .sf-val.g {
+        color: var(--g);
+      }
+      .sf-val.y {
+        color: var(--y);
+      }
+      .sf-val.mg {
+        color: var(--mg);
+      }
+      .sf-div {
+        width: 1px;
+        height: 14px;
+        background: var(--line);
+      }
+
+      /* ── TOAST ── */
+      .toast {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 9999;
+        background: var(--bg2);
+        padding: 10px 16px;
+        font-family: var(--m);
+        font-size: 11px;
+        display: none;
+        max-width: 360px;
+        animation: toast-pop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        border-left: 3px solid var(--mg);
+        color: var(--mg);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+      }
+      .toast.show {
+        display: block;
+      }
+      .toast.err {
+        border-left-color: var(--r);
+        color: var(--r);
+      }
+      .toast.info {
+        border-left-color: var(--y);
+        color: var(--y);
+      }
+      @keyframes toast-pop {
+        from {
+          transform: translateY(12px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      /* ════════════════════════════════════
+       LOGIN SCREEN (DID Auth Flow)
+  ════════════════════════════════════ */
+      #loginScreen {
+        position: fixed;
+        inset: 0;
+        z-index: 99999;
+        background: var(--bg0);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+      }
+      #loginScreen.hidden {
+        display: none;
+      }
+
+      .login-container {
+        width: 100%;
+        max-width: 460px;
+      }
+
+      .login-brand {
+        text-align: center;
+        margin-bottom: 2rem;
+      }
+      .login-brand-logo {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, var(--y), #c88000);
+        border-radius: 12px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 26px;
+        margin-bottom: 0.75rem;
+        box-shadow: 0 0 24px rgba(240, 185, 11, 0.35);
+        animation: login-pulse 3s ease-in-out infinite;
+      }
+      @keyframes login-pulse {
+        0%,
+        100% {
+          box-shadow: 0 0 20px rgba(240, 185, 11, 0.3);
+        }
+        50% {
+          box-shadow:
+            0 0 44px rgba(240, 185, 11, 0.6),
+            0 0 80px rgba(240, 185, 11, 0.15);
+        }
+      }
+      .login-brand h1 {
+        font-family: var(--h);
+        font-size: 1.8rem;
+        font-weight: 900;
+        color: var(--y);
+        letter-spacing: 2px;
+      }
+      .login-brand p {
+        font-family: var(--m);
+        font-size: 0.75rem;
+        color: var(--txt3);
+        margin-top: 0.3rem;
+      }
+
+      .login-card {
+        background: var(--bg1);
+        border: 1px solid var(--line2);
+        padding: 2rem;
+        position: relative;
+        overflow: hidden;
+      }
+      .login-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, var(--y), #c88000, transparent);
+      }
+
+      .login-steps-bar {
+        display: flex;
+        gap: 0.4rem;
+        margin-bottom: 1.5rem;
+      }
+      .lsb-dot {
+        flex: 1;
+        height: 3px;
+        border-radius: 2px;
+        background: var(--bg3);
+        border: 1px solid var(--line);
+        transition: background 0.3s;
+      }
+      .lsb-dot.active {
+        background: var(--y);
+      }
+      .lsb-dot.done {
+        background: var(--mg);
+      }
+
+      .login-step {
+        display: none;
+      }
+      .login-step.active {
+        display: block;
+        animation: ls-slide 0.3s ease;
+      }
+      @keyframes ls-slide {
+        from {
+          opacity: 0;
+          transform: translateX(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      .ls-label {
+        font-family: var(--m);
+        font-size: 0.65rem;
+        color: var(--y);
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        margin-bottom: 0.4rem;
+      }
+      .ls-title {
+        font-family: var(--h);
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--txt);
+        margin-bottom: 0.25rem;
+      }
+      .ls-desc {
+        font-family: var(--f);
+        font-size: 0.8rem;
+        color: var(--txt2);
+        margin-bottom: 1.25rem;
+        line-height: 1.55;
+      }
+
+      .lf-group {
+        margin-bottom: 0.85rem;
+      }
+      .lf-label {
+        display: block;
+        font-family: var(--m);
+        font-size: 0.7rem;
+        color: var(--txt3);
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        margin-bottom: 0.35rem;
+      }
+      .lf-input {
+        width: 100%;
+        background: var(--bg2);
+        border: 1px solid var(--line2);
+        color: var(--txt);
+        font-family: var(--m);
+        font-size: 0.82rem;
+        padding: 0.65rem 0.9rem;
+        outline: none;
+        transition: border-color 0.2s;
+      }
+      .lf-input:focus {
+        border-color: var(--y);
+        box-shadow: 0 0 0 3px rgba(240, 185, 11, 0.08);
+      }
+      .lf-input::placeholder {
+        color: var(--txt3);
+      }
+
+      .did-doc-display {
+        background: var(--bg2);
+        border: 1px solid var(--y);
+        padding: 0.7rem 0.9rem;
+        font-family: var(--m);
+        font-size: 0.72rem;
+        color: var(--y);
+        word-break: break-all;
+        line-height: 1.6;
+        position: relative;
+        overflow: hidden;
+        white-space: pre-wrap;
+      }
+      .did-doc-display::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 3px;
+        background: var(--y);
+        animation: blink-cur 1s step-end infinite;
+      }
+      @keyframes blink-cur {
+        50% {
+          opacity: 0;
+        }
+      }
+
+      .challenge-box {
+        background: rgba(124, 58, 237, 0.08);
+        border: 1px solid rgba(124, 58, 237, 0.35);
+        padding: 0.85rem;
+        margin-bottom: 0.85rem;
+      }
+      .challenge-lbl {
+        font-family: var(--m);
+        font-size: 0.6rem;
+        color: #7c3aed;
+        letter-spacing: 2px;
+        margin-bottom: 0.4rem;
+      }
+      .challenge-val {
+        font-family: var(--m);
+        font-size: 0.72rem;
+        color: var(--txt);
+        word-break: break-all;
+      }
+
+      .ls-loading {
+        height: 2px;
+        background: var(--bg3);
+        overflow: hidden;
+        margin: 0.85rem 0;
+        display: none;
+      }
+      .ls-loading.on {
+        display: block;
+      }
+      .ls-loading::after {
+        content: "";
+        display: block;
+        height: 100%;
+        width: 40%;
+        background: linear-gradient(90deg, transparent, var(--y), transparent);
+        animation: ls-load 1.2s ease-in-out infinite;
+      }
+      @keyframes ls-load {
+        0% {
+          transform: translateX(-150%);
+        }
+        100% {
+          transform: translateX(350%);
+        }
+      }
+
+      .ls-status {
+        font-family: var(--m);
+        font-size: 0.72rem;
+        padding: 0.45rem 0.75rem;
+        margin-bottom: 0.85rem;
+        display: none;
+      }
+      .ls-status.success {
+        background: rgba(14, 203, 129, 0.08);
+        color: var(--mg);
+        border: 1px solid rgba(14, 203, 129, 0.25);
+        display: block;
+      }
+      .ls-status.error {
+        background: rgba(246, 70, 93, 0.08);
+        color: var(--r);
+        border: 1px solid rgba(246, 70, 93, 0.25);
+        display: block;
+      }
+      .ls-status.info {
+        background: rgba(240, 185, 11, 0.06);
+        color: var(--y);
+        border: 1px solid rgba(240, 185, 11, 0.2);
+        display: block;
+      }
+
+      .btn-login-primary {
+        width: 100%;
+        padding: 0.8rem;
+        border: none;
+        cursor: pointer;
+        background: linear-gradient(135deg, var(--y), #c88000);
+        color: #000;
+        font-family: var(--h);
+        font-size: 0.9rem;
+        font-weight: 900;
+        letter-spacing: 1.5px;
+        transition: all 0.2s;
+        clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%);
+      }
+      .btn-login-primary:hover {
+        filter: brightness(1.1);
+        box-shadow: 0 6px 22px rgba(240, 185, 11, 0.3);
+      }
+
+      .btn-login-ghost {
+        width: 100%;
+        padding: 0.65rem;
+        border: 1px solid var(--line2);
+        background: transparent;
+        color: var(--txt3);
+        cursor: pointer;
+        font-family: var(--m);
+        font-size: 0.78rem;
+        margin-top: 0.5rem;
+        transition: all 0.2s;
+      }
+      .btn-login-ghost:hover {
+        border-color: var(--y);
+        color: var(--y);
+      }
+    </style>
+  </head>
+  <body style="display: flex; flex-direction: column; height: 100vh">
+    <!-- ════════════════════════════════════
+     LOGIN SCREEN — DID Authentication
+════════════════════════════════════ -->
+    <div id="loginScreen">
+      <div class="login-container">
+        <div class="login-brand">
+          <div class="login-brand-logo">
+            <svg width="30" height="30" viewBox="0 0 26 26">
+              <polygon
+                points="13,1 25,7 25,19 13,25 1,19 1,7"
+                fill="none"
+                stroke="#000"
+                stroke-width="1.5"
+              />
+              <polygon
+                points="13,5 21,9 21,17 13,21 5,17 5,9"
+                fill="rgba(0,0,0,.2)"
+                stroke="#000"
+                stroke-width="1"
+              />
+              <text
+                x="13"
+                y="17"
+                font-family="Orbitron"
+                font-size="7"
+                fill="#000"
+                text-anchor="middle"
+                font-weight="700"
+              >
+                ID
+              </text>
+            </svg>
+          </div>
+          <h1>IDEX</h1>
+          <p>// decentralized identity exchange platform</p>
+        </div>
+
+        <div class="login-card">
+          <!-- Step indicator dots -->
+          <div class="login-steps-bar">
+            <div class="lsb-dot active" id="ldot0"></div>
+            <div class="lsb-dot" id="ldot1"></div>
+            <div class="lsb-dot" id="ldot2"></div>
+            <div class="lsb-dot" id="ldot3"></div>
+          </div>
+
+          <!-- Step 0: Enter DID -->
+          <div class="login-step active" id="lstep0">
+            <div class="ls-label">// STEP 01 — IDENTITY</div>
+            <div class="ls-title">Nhập DID của bạn</div>
+            <div class="ls-desc">
+              Nhập Decentralized Identifier để bắt đầu quá trình xác thực danh
+              tính trên blockchain.
+            </div>
+            <div class="ls-status" id="lstat0"></div>
+            <div class="lf-group">
+              <label class="lf-label">DID</label>
+              <input
+                class="lf-input"
+                id="lDIDInput"
+                placeholder="did:example:123abc..."
+                value="did:polygon:trader0xA3f9B12c"
+              />
+            </div>
+            <div class="ls-loading" id="lload0"></div>
+            <button class="btn-login-primary" onclick="lStep0Next()">
+              TIẾP THEO →
+            </button>
+          </div>
+
+          <!-- Step 1: Fetch DID Document -->
+          <div class="login-step" id="lstep1">
+            <div class="ls-label">// STEP 02 — BLOCKCHAIN LOOKUP</div>
+            <div class="ls-title">Truy vấn DID Document</div>
+            <div class="ls-desc">
+              Hệ thống đang lấy DID Document từ Polygon blockchain network.
+            </div>
+            <div class="ls-status" id="lstat1"></div>
+            <div class="lf-group">
+              <label class="lf-label">DID Document (từ blockchain)</label>
+              <div class="did-doc-display" id="lDIDDoc">Đang truy vấn...</div>
+            </div>
+            <div class="ls-loading" id="lload1"></div>
+            <button class="btn-login-primary" onclick="lStep1Next()">
+              XÁC NHẬN PUBLIC KEY →
+            </button>
+            <button class="btn-login-ghost" onclick="lGoStep(0)">
+              ← QUAY LẠI
+            </button>
+          </div>
+
+          <!-- Step 2: Sign Challenge -->
+          <div class="login-step" id="lstep2">
+            <div class="ls-label">// STEP 03 — CHALLENGE-RESPONSE</div>
+            <div class="ls-title">Ký Challenge</div>
+            <div class="ls-desc">
+              Server gửi challenge ngẫu nhiên. Ký bằng Private Key để xác minh
+              danh tính.
+            </div>
+            <div class="ls-status" id="lstat2"></div>
+            <div class="challenge-box">
+              <div class="challenge-lbl">// SERVER CHALLENGE</div>
+              <div class="challenge-val" id="lChallengeVal">
+                Đang tạo challenge...
+              </div>
+            </div>
+            <div class="lf-group">
+              <label class="lf-label">Chữ ký (Signature)</label>
+              <input
+                class="lf-input"
+                id="lSigInput"
+                placeholder="Nhập hoặc paste signature..."
+                style="font-size: 0.7rem"
+              />
+            </div>
+            <div class="ls-loading" id="lload2"></div>
+            <button class="btn-login-primary" onclick="lStep2Next()">
+              GỬI DID & SIGNATURE →
+            </button>
+            <button class="btn-login-ghost" onclick="lGoStep(1)">
+              ← QUAY LẠI
+            </button>
+          </div>
+
+          <!-- Step 3: Verifying -->
+          <div class="login-step" id="lstep3">
+            <div class="ls-label">// STEP 04 — VERIFICATION</div>
+            <div class="ls-title">Xác minh danh tính</div>
+            <div class="ls-desc">
+              Hệ thống đang xác minh Verifiable Credential và chữ ký của bạn
+              trên blockchain.
+            </div>
+            <div class="ls-status" id="lstat3"></div>
+            <div class="ls-loading on" id="lload3"></div>
+            <button
+              class="btn-login-primary"
+              id="lEnterBtn"
+              onclick="lEnterApp()"
+              style="display: none"
+            >
+              ⬡ VÀO SÀN GIAO DỊCH
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      id="mainApp"
+      style="
+        display: none;
+        flex-direction: column;
+        height: 100vh;
+        overflow: hidden;
+        flex: 1;
+      "
+    >
+      <!-- ════ APP BAR ════ -->
+      <div class="app-bar">
+        <div class="app-logo">
+          <svg viewBox="0 0 26 26">
+            <polygon
+              points="13,1 25,7 25,19 13,25 1,19 1,7"
+              fill="none"
+              stroke="#f0b90b"
+              stroke-width="1.5"
+            />
+            <polygon
+              points="13,5 21,9 21,17 13,21 5,17 5,9"
+              fill="rgba(240,185,11,.12)"
+              stroke="#f0b90b"
+              stroke-width="1"
+            />
+            <text
+              x="13"
+              y="17"
+              font-family="Orbitron"
+              font-size="7"
+              fill="#f0b90b"
+              text-anchor="middle"
+              font-weight="700"
+            >
+              ID
+            </text>
+          </svg>
+          <div class="app-logo-txt">IDEX</div>
+        </div>
+
+        <div class="view-tabs">
+          <div
+            class="view-tab active-exchange"
+            id="tab-exchange"
+            onclick="switchView('exchange')"
+          >
+            <svg
+              viewBox="0 0 14 14"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+            >
+              <rect x="1" y="3" width="12" height="9" rx="1" />
+              <path d="M1 6h12" />
+              <path d="M5 3V2" />
+              <path d="M9 3V2" />
+            </svg>
+            Sàn giao dịch
+          </div>
+          <div class="view-tab" id="tab-miner" onclick="switchView('miner')">
+            <svg
+              viewBox="0 0 14 14"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+            >
+              <polygon points="7,1 13,4.5 13,10.5 7,14 1,10.5 1,4.5" />
+              <circle cx="7" cy="7" r="2" />
+            </svg>
+            Miner Dashboard
+          </div>
+        </div>
+
+        <!-- PIPE INDICATOR: real-time connection status -->
+        <div
+          class="pipe-indicator"
+          onclick="switchView('miner')"
+          title="Click để xem Mempool của Miner"
+        >
+          <div class="pipe-dot"></div>
+          <span style="font-size: 9px">TX → MEMPOOL</span>
+          <div class="pipe-count zero" id="pipe-count">0</div>
+        </div>
+
+        <div class="app-bar-right">
+          <div class="status-chip">
+            <div class="status-dot"></div>
+            MAINNET · POLYGON
+          </div>
+          <div
+            class="status-chip"
+            style="cursor: pointer"
+            onclick="switchView('miner')"
+          >
+            <svg
+              width="10"
+              height="10"
+              viewBox="0 0 14 14"
+              fill="none"
+              stroke="var(--mg)"
+              stroke-width="1.5"
+            >
+              <polygon points="7,1 13,4.5 13,10.5 7,14 1,10.5 1,4.5" />
+            </svg>
+            <span style="color: var(--mg)" id="hdr-blocks">3 blocks</span>
+          </div>
+          <div class="did-chip" id="did-chip">
+            <div class="did-av" id="did-av">?</div>
+            <div>
+              <div class="did-name-txt" id="did-name">Đang tải...</div>
+              <div class="did-addr-txt" id="did-addr">did:polygon:...</div>
+            </div>
+            <div class="did-verified" id="did-verified" style="display: none">
+              ✓ VERIFIED
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TX SENT BANNER -->
+      <div class="tx-sent-banner" id="tx-banner"></div>
+
+      <!-- ════ EXCHANGE VIEW ════ -->
+      <div class="view active" id="view-exchange">
+        <!-- Pair bar -->
+        <div class="ex-pairbar">
+          <div class="pair-badge">
+            <div class="pair-icons-wrap">
+              <div class="ci a">₿</div>
+              <div class="ci b" style="left: 14px">U</div>
+            </div>
+            <div>
+              <div class="pb-name">BTC/USDT</div>
+              <div class="pb-sub">Bitcoin</div>
+            </div>
+          </div>
+          <div class="pb-div"></div>
+          <div class="pb-stat">
+            <div class="pb-val g" id="ex-price">67,420.82</div>
+            <div class="pb-lbl">Giá hiện tại</div>
+          </div>
+          <div class="pb-div"></div>
+          <div class="pb-stat">
+            <div class="pb-val g">+2.46%</div>
+            <div class="pb-lbl">24h</div>
+          </div>
+          <div class="pb-div"></div>
+          <div class="pb-stat">
+            <div class="pb-val">69,804.00</div>
+            <div class="pb-lbl">Cao nhất</div>
+          </div>
+          <div class="pb-stat">
+            <div class="pb-val">65,100.00</div>
+            <div class="pb-lbl">Thấp nhất</div>
+          </div>
+          <div class="pb-div"></div>
+          <div class="pb-stat">
+            <div class="pb-val">28,492 BTC</div>
+            <div class="pb-lbl">KL 24h</div>
+          </div>
+        </div>
+
+        <div
+          style="
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            min-height: 0;
+          "
+        >
+          <div class="ex-layout">
+            <!-- Pair list -->
+            <div class="ex-pairs">
+              <div class="ex-pairs-tabs">
+                <div class="ept on">⭐</div>
+                <div class="ept">USDT</div>
+                <div class="ept">BTC</div>
+                <div class="ept">ETH</div>
+              </div>
+              <div class="pairs-search-wrap">
+                <input
+                  class="pair-search-inp"
+                  type="text"
+                  placeholder="🔍 Tìm cặp..."
+                />
+              </div>
+              <div class="pairs-col-hdr">
+                <span>Cặp</span><span style="text-align: right">Giá</span
+                ><span style="text-align: right">24h</span>
+              </div>
+              <div class="pairs-scr" id="ex-pairs-list"></div>
+            </div>
+
+            <!-- Chart + Trades -->
+            <div class="ex-chart">
+              <div class="chart-toolbar">
+                <div class="tb-btn">TF</div>
+                <div class="tb-sep"></div>
+                <div class="tb-btn">1m</div>
+                <div class="tb-btn">5m</div>
+                <div class="tb-btn">15m</div>
+                <div class="tb-btn on">1h</div>
+                <div class="tb-btn">4h</div>
+                <div class="tb-btn">1D</div>
+                <div class="tb-sep"></div>
+                <div class="tb-btn">MA</div>
+                <div class="tb-btn">BB</div>
+                <div class="tb-btn">RSI</div>
+              </div>
+              <div class="chart-wrap"><canvas id="exchart"></canvas></div>
+              <div class="recent-trades-panel">
+                <div class="panel-hdr">Giao dịch gần đây</div>
+                <div class="trades-col-hdr">
+                  <span>Giá(USDT)</span
+                  ><span style="text-align: right">KL(BTC)</span
+                  ><span style="text-align: right">Thời gian</span>
+                </div>
+                <div class="trades-scr" id="ex-trades"></div>
+              </div>
+            </div>
+
+            <!-- Order Book -->
+            <div class="ex-book">
+              <div class="panel-hdr" style="padding: 8px 12px">Sổ lệnh</div>
+              <div class="book-col-hdr">
+                <span>Giá</span><span>KL(BTC)</span><span>Tổng</span>
+              </div>
+              <div class="book-asks" id="book-asks"></div>
+              <div class="spread-mid">
+                <span class="spread-price up" id="spread-p">67,420.82</span>
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="var(--g)">
+                  <path d="M5 1l4 8H1z" />
+                </svg>
+                <span
+                  style="
+                    font-family: var(--m);
+                    font-size: 9px;
+                    color: var(--txt3);
+                  "
+                  >spread</span
+                >
+              </div>
+              <div class="book-bids" id="book-bids"></div>
+            </div>
+
+            <!-- Order Form -->
+            <div class="ex-form">
+              <!-- Balance -->
+              <div class="bal-panel">
+                <div class="bal-title">
+                  Số dư tài khoản
+                  <span style="font-size: 9px; color: var(--b); cursor: pointer"
+                    >+ Nạp tiền</span
+                  >
+                </div>
+                <div class="bal-row">
+                  <div class="bal-coin-wrap">
+                    <div class="bal-dot bd-btc">₿</div>
+                    <span class="bal-name-s">BTC</span>
+                  </div>
+                  <div style="text-align: right">
+                    <div class="bal-amt" id="ex-bal-btc">0.84200</div>
+                    <div class="bal-sub" id="ex-bal-btc-usd">≈ $56,749</div>
+                  </div>
+                </div>
+                <div class="bal-row">
+                  <div class="bal-coin-wrap">
+                    <div class="bal-dot bd-usdt">₮</div>
+                    <span class="bal-name-s">USDT</span>
+                  </div>
+                  <div style="text-align: right">
+                    <div class="bal-amt" id="ex-bal-usdt">12,450.00</div>
+                    <div class="bal-sub">≈ $12,450</div>
+                  </div>
+                </div>
+                <div class="bal-row">
+                  <span style="font-size: 9px; color: var(--txt3)"
+                    >Tổng tài sản</span
+                  >
+                  <span
+                    style="
+                      font-family: var(--m);
+                      font-size: 9px;
+                      color: var(--txt2);
+                    "
+                    id="ex-total-asset"
+                    >1.027 BTC</span
+                  >
+                </div>
+              </div>
+
+              <div class="order-tabs">
+                <div class="otab on">Giới hạn</div>
+                <div class="otab">Thị trường</div>
+                <div class="otab">Stop-Limit</div>
+                <div class="otab">OCO</div>
+              </div>
+
+              <div class="form-inner">
+                <div class="bs-tabs">
+                  <div
+                    class="bstab buy"
+                    id="ex-tab-buy"
+                    onclick="exSwitchSide('buy')"
+                  >
+                    Mua BTC
+                  </div>
+                  <div
+                    class="bstab sell off"
+                    id="ex-tab-sell"
+                    onclick="exSwitchSide('sell')"
+                  >
+                    Bán BTC
+                  </div>
+                </div>
+
+                <div class="avail-row">
+                  <span class="avail-lbl">Khả dụng</span>
+                  <span class="avail-val"
+                    ><span
+                      id="ex-avail-num"
+                      style="
+                        font-family: var(--m);
+                        font-weight: 600;
+                        color: var(--txt);
+                      "
+                      >12,450.00</span
+                    >
+                    <span id="ex-avail-unit" style="color: var(--txt3)"
+                      >USDT</span
+                    ></span
+                  >
+                </div>
+
+                <div class="inp-grp" style="margin-top: 18px">
+                  <div class="inp-lbl">Giá</div>
+                  <div class="inp-wrap">
+                    <input
+                      class="inp-field"
+                      type="number"
+                      id="ex-price-inp"
+                      value="67420.82"
+                    />
+                    <span class="inp-unit">USDT</span>
+                    <div class="inp-btn-grp">
+                      <div class="inp-pm" onclick="exAdjPrice(-10)">−</div>
+                      <div class="inp-pm" onclick="exAdjPrice(10)">+</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="inp-grp" style="margin-top: 18px">
+                  <div class="inp-lbl">Khối lượng</div>
+                  <div class="inp-wrap">
+                    <input
+                      class="inp-field"
+                      type="number"
+                      id="ex-amount-inp"
+                      placeholder="0.00000"
+                      oninput="exCalcTotal()"
+                    />
+                    <span class="inp-unit">BTC</span>
+                  </div>
+                </div>
+
+                <div class="pct-row">
+                  <div class="pct-b" onclick="exSetPct(25, this)">25%</div>
+                  <div class="pct-b" onclick="exSetPct(50, this)">50%</div>
+                  <div class="pct-b" onclick="exSetPct(75, this)">75%</div>
+                  <div class="pct-b" onclick="exSetPct(100, this)">100%</div>
+                </div>
+
+                <div class="inp-grp" style="margin-top: 6px">
+                  <div class="inp-lbl">Tổng tiền</div>
+                  <div class="inp-wrap">
+                    <input
+                      class="inp-field"
+                      type="number"
+                      id="ex-total-inp"
+                      placeholder="0.00"
+                      oninput="exCalcFromTotal()"
+                    />
+                    <span class="inp-unit">USDT</span>
+                  </div>
+                </div>
+
+                <div class="order-sum" style="margin-top: 12px">
+                  <div class="sum-r">
+                    <span class="sum-k">Phí (0.1%)</span
+                    ><span class="sum-v" id="ex-fee">0.00 USDT</span>
+                  </div>
+                  <div class="sum-r">
+                    <span class="sum-k">Tổng thanh toán</span
+                    ><span class="sum-v" id="ex-total-pay">0.00 USDT</span>
+                  </div>
+                </div>
+
+                <button
+                  class="btn-place buy"
+                  id="ex-btn-place"
+                  onclick="exPlaceOrder()"
+                >
+                  Mua BTC
+                  <span class="going-to-mempool"
+                    >→ Giao dịch sẽ vào Mempool của Miner</span
+                  >
+                </button>
+
+                <div
+                  style="
+                    margin-top: 10px;
+                    border-top: 1px solid var(--line);
+                    padding-top: 8px;
+                  "
+                >
+                  <div
+                    style="
+                      display: flex;
+                      justify-content: space-between;
+                      font-size: 10px;
+                      color: var(--txt3);
+                      margin-bottom: 5px;
+                    "
+                  >
+                    <span>Lệnh mở (<span id="ex-open-count">0</span>)</span>
+                    <span style="color: var(--b); cursor: pointer"
+                      >Xem tất cả</span
+                    >
+                  </div>
+                  <div
+                    style="
+                      font-size: 10px;
+                      color: var(--txt3);
+                      text-align: center;
+                      padding: 8px 0;
+                    "
+                    id="ex-no-orders"
+                  >
+                    Không có lệnh mở
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom orders -->
+          <div class="ex-bottom">
+            <div class="ex-btabs">
+              <div class="ebtab on">
+                Lệnh mở (<span id="ex-open-count2">0</span>)
+              </div>
+              <div class="ebtab">Lịch sử lệnh</div>
+              <div class="ebtab">Vốn</div>
+            </div>
+            <div class="orders-tbl">
+              <div class="otbl-hdr">
+                <span>Thời gian</span><span>Cặp</span><span>Loại</span
+                ><span>Bên</span><span>Giá</span><span>KL</span
+                ><span>Đã khớp</span><span>Thao tác</span>
+              </div>
+              <div class="empty-row" id="ex-empty-orders">Chưa có lệnh mở</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- /view-exchange -->
+
+      <!-- ════ MINER VIEW ════ -->
+      <div class="view" id="view-miner">
+        <div class="mn-layout">
+          <!-- Miner Sidebar -->
+          <div class="mn-sidebar">
+            <div class="mn-sec">
+              <div class="mn-sec-title">Số dư Miner</div>
+              <div class="mn-bal">
+                <div class="mnb-top">
+                  <div class="mnb-coin">
+                    <div class="mn-coin-dot btc">₿</div>
+                    <div class="mnb-name">Bitcoin</div>
+                  </div>
+                  <div class="mnb-chg up">+2.46%</div>
+                </div>
+                <div class="mnb-amount" id="mn-bal-btc">0.84200 BTC</div>
+                <div class="mnb-usd" id="mn-bal-btc-usd">≈ $56,749</div>
+              </div>
+              <div class="mn-bal">
+                <div class="mnb-top">
+                  <div class="mnb-coin">
+                    <div class="mn-coin-dot usdt">₮</div>
+                    <div class="mnb-name">USDT</div>
+                  </div>
+                  <div class="mnb-chg up">+0.01%</div>
+                </div>
+                <div class="mnb-amount" id="mn-bal-usdt">12,450.00 USDT</div>
+                <div class="mnb-usd">≈ $12,450</div>
+              </div>
+            </div>
+
+            <div class="mn-sec">
+              <div class="mn-sec-title">Thống kê</div>
+              <div class="mn-stats-grid">
+                <div class="mn-stat-card">
+                  <div
+                    class="mnsc-val"
+                    style="color: var(--y)"
+                    id="mn-blocks-mined"
+                  >
+                    3
+                  </div>
+                  <div class="mnsc-lbl">BLOCKS MINED</div>
+                </div>
+                <div class="mn-stat-card">
+                  <div
+                    class="mnsc-val"
+                    style="color: var(--mg)"
+                    id="mn-total-reward"
+                  >
+                    9.375
+                  </div>
+                  <div class="mnsc-lbl">BTC EARNED</div>
+                </div>
+                <div class="mn-stat-card">
+                  <div
+                    class="mnsc-val"
+                    style="color: var(--b)"
+                    id="mn-hashrate"
+                  >
+                    1.24
+                  </div>
+                  <div class="mnsc-lbl">MH/s</div>
+                </div>
+                <div class="mn-stat-card">
+                  <div class="mnsc-val" style="color: var(--txt)">4</div>
+                  <div class="mnsc-lbl">DIFFICULTY</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- TX SELECTION PANEL -->
+            <div class="tx-select-panel" id="tx-select-panel">
+              <div class="tx-select-header">
+                <div class="tx-select-title">
+                  <svg
+                    viewBox="0 0 10 10"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                  >
+                    <rect x="1" y="1" width="8" height="8" rx="1" />
+                    <path d="M3 5l1.5 1.5L7 3" />
+                  </svg>
+                  Lựa chọn giao dịch
+                </div>
+                <div class="tx-slot-counter" id="tx-slot-counter">
+                  <span class="tx-slot-used" id="tx-slot-used">0</span>
+                  <span class="tx-slot-sep">/</span>
+                  <span class="tx-slot-max">5</span>
+                </div>
+              </div>
+              <div class="tx-slot-bars">
+                <div class="tx-slot-bar" id="tsb-0"></div>
+                <div class="tx-slot-bar" id="tsb-1"></div>
+                <div class="tx-slot-bar" id="tsb-2"></div>
+                <div class="tx-slot-bar" id="tsb-3"></div>
+                <div class="tx-slot-bar" id="tsb-4"></div>
+              </div>
+              <div class="tx-select-empty" id="tx-select-empty">
+                <div style="font-size: 16px; margin-bottom: 4px">📋</div>
+                Chưa có giao dịch nào.<br />Thực hiện Mua / Bán<br />để tạo giao
+                dịch mới.
+              </div>
+              <div class="tx-select-list" id="tx-select-list"></div>
+              <div
+                class="tx-select-footer"
+                id="tx-select-footer"
+                style="display: none"
+              >
+                <button class="btn-clear-sel" onclick="txSelClearAll()">
+                  ✕ Bỏ chọn
+                </button>
+                <button
+                  class="btn-add-to-block"
+                  id="btn-add-to-block"
+                  onclick="txSelAddToBlock()"
+                  disabled
+                >
+                  ⛏ THÊM VÀO BLOCK
+                </button>
+              </div>
+            </div>
+
+            <!-- MEMPOOL -->
+            <div class="mn-mempool">
+              <div class="mp-toolbar">
+                <div class="mp-toolbar-title">MEMPOOL</div>
+                <div class="mp-count-badge" id="mn-mp-count">0</div>
+                <div class="select-all-btn" onclick="selectAllMp()">
+                  Chọn tất cả
+                </div>
+              </div>
+              <div class="mp-col-hdr">
+                <span>TX / Người gửi</span><span>Phí</span><span>Loại</span>
+              </div>
+              <div class="mp-list" id="mn-mp-list"></div>
+            </div>
+          </div>
+
+          <!-- Miner Center -->
+          <div class="mn-center">
+            <div class="mining-engine-panel">
+              <div class="eng-title">
+                ⛏ MINING ENGINE
+                <span
+                  class="eng-status"
+                  id="eng-status"
+                  style="color: var(--txt2)"
+                  >READY</span
+                >
+              </div>
+
+              <div class="block-preview">
+                <div class="bp-grid">
+                  <div class="bp-f">
+                    <div class="bp-lbl">Block #</div>
+                    <div class="bp-val nonce-v" id="bp-num">4</div>
+                  </div>
+                  <div class="bp-f">
+                    <div class="bp-lbl">TX đã chọn</div>
+                    <div class="bp-val" id="bp-txcount">0 TX</div>
+                  </div>
+                  <div class="bp-f" style="grid-column: span 2">
+                    <div class="bp-lbl">Previous Hash</div>
+                    <div class="bp-val hash-v" id="bp-prevhash">...</div>
+                  </div>
+                  <div class="bp-f">
+                    <div class="bp-lbl">Nonce</div>
+                    <div class="bp-val nonce-v" id="bp-nonce">0</div>
+                  </div>
+                  <div class="bp-f">
+                    <div class="bp-lbl">Target</div>
+                    <div class="bp-val" style="color: var(--r)" id="bp-diff">
+                      0000... (4 zeros)
+                    </div>
+                  </div>
+                </div>
+                <div class="bp-lbl" style="margin-bottom: 4px">Hash Output</div>
+                <div class="hash-output" id="mn-hash-out">
+                  <span style="color: var(--txt3)"
+                    >Chọn TX → Nhấn MINE để bắt đầu đào...</span
+                  >
+                </div>
+                <div class="progress-track">
+                  <div class="progress-fill" id="mn-progress"></div>
+                </div>
+                <div class="progress-meta">
+                  <span id="mn-attempts">0 attempts</span
+                  ><span id="mn-speed">0 H/s</span>
+                </div>
+              </div>
+
+              <div class="mine-btn-row">
+                <button class="btn-mine" id="btn-mine" onclick="startMining()">
+                  ⛏ BẮT ĐẦU ĐÀO
+                </button>
+                <button
+                  class="btn-stop-mine"
+                  id="btn-stop"
+                  onclick="stopMining()"
+                >
+                  ■ DỪNG
+                </button>
+              </div>
+
+              <div class="mine-metrics">
+                <div class="mm-item">
+                  <div class="mm-val" id="mm-total">0</div>
+                  <div class="mm-lbl">TOTAL HASHES</div>
+                </div>
+                <div class="mm-item">
+                  <div class="mm-val" id="mm-time">0.0s</div>
+                  <div class="mm-lbl">ELAPSED</div>
+                </div>
+                <div class="mm-item">
+                  <div class="mm-val" id="mm-session">0</div>
+                  <div class="mm-lbl">SESSION BLOCKS</div>
+                </div>
+                <div class="mm-item">
+                  <div class="mm-val" id="mm-reward" style="color: var(--y)">
+                    0 BTC
+                  </div>
+                  <div class="mm-lbl">SESSION REWARD</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="chain-panel">
+              <div class="chain-hdr">Blockchain — Bất biến &amp; Minh bạch</div>
+              <div class="chain-scroll" id="chain-container"></div>
+              <div class="chain-integrity">
+                <div class="ci-dot"></div>
+                <span class="ci-txt"
+                  >Chain:
+                  <span style="color: var(--mg)" id="ci-status"
+                    >VALID ✓</span
+                  ></span
+                >
+                <span
+                  style="
+                    font-family: var(--m);
+                    font-size: 9px;
+                    color: var(--txt2);
+                  "
+                  id="ci-count"
+                  >4 blocks</span
+                >
+                <span class="ci-right" id="ci-hash">Latest: ...</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Miner Right -->
+          <div class="mn-right">
+            <div class="sec-panel">
+              <div class="mn-sec-title">Bảo mật đa lớp</div>
+              <div class="sec-layer-item">
+                <div class="sli-icon">🔐</div>
+                <div class="sli-info">
+                  <div class="sli-name">Digital Signature</div>
+                  <div class="sli-desc">SHA-256 · Private Key Sign</div>
+                </div>
+                <div class="sli-status">ACTIVE</div>
+              </div>
+              <div class="sec-layer-item">
+                <div class="sli-icon">⛏</div>
+                <div class="sli-info">
+                  <div class="sli-name">Proof of Work</div>
+                  <div class="sli-desc">Nonce · 4 leading zeros</div>
+                </div>
+                <div class="sli-status" id="sec-pow">READY</div>
+              </div>
+              <div class="sec-layer-item">
+                <div class="sli-icon">🌳</div>
+                <div class="sli-info">
+                  <div class="sli-name">Merkle Tree</div>
+                  <div class="sli-desc">TX Root Integrity</div>
+                </div>
+                <div class="sli-status">VALID</div>
+              </div>
+              <div class="sec-layer-item">
+                <div class="sli-icon">🔗</div>
+                <div class="sli-info">
+                  <div class="sli-name">Chain Linking</div>
+                  <div class="sli-desc">prevHash → Immutable</div>
+                </div>
+                <div class="sli-status">LINKED</div>
+              </div>
+            </div>
+
+            <div class="merkle-panel">
+              <div
+                style="
+                  display: flex;
+                  align-items: center;
+                  justify-content: space-between;
+                  margin-bottom: 6px;
+                "
+              >
+                <div class="mn-sec-title" style="margin-bottom: 0; flex: 1">
+                  Merkle Tree
+                </div>
+                <div
+                  style="
+                    font-family: var(--m);
+                    font-size: 7px;
+                    color: var(--b);
+                    background: rgba(30, 156, 215, 0.08);
+                    border: 1px solid rgba(30, 156, 215, 0.2);
+                    padding: 1px 6px;
+                    letter-spacing: 1px;
+                  "
+                >
+                  AUTO
+                </div>
+              </div>
+              <div
+                style="
+                  font-family: var(--m);
+                  font-size: 8px;
+                  color: var(--txt3);
+                  margin-bottom: 6px;
+                  display: flex;
+                  align-items: center;
+                  gap: 4px;
+                "
+              >
+                <span>ROOT:</span>
+                <span id="mk-root-display" style="color: var(--mg)">N/A</span>
+              </div>
+              <div class="merkle-box" id="mn-merkle">
+                <div
+                  style="
+                    font-family: var(--m);
+                    font-size: 9px;
+                    color: var(--txt3);
+                    text-align: center;
+                    padding: 16px 8px;
+                  "
+                >
+                  ⬡<br /><br />Chưa có TX nào trong block.<br />Thêm giao dịch
+                  vào block để<br />tính Merkle Tree tự động.
+                </div>
+              </div>
+            </div>
+
+            <!-- Quick TX form -->
+            <div class="mn-tx-form">
+              <div class="mn-form-title">Thêm giao dịch thủ công</div>
+              <div class="mf-group">
+                <div class="mf-lbl">Loại</div>
+                <select
+                  class="mf-select"
+                  id="mn-tx-type"
+                  onchange="mnUpdateForm()"
+                >
+                  <option value="buy">🟢 Mua BTC</option>
+                  <option value="send">🔵 Chuyển tiền</option>
+                </select>
+              </div>
+              <div class="mf-row">
+                <div class="mf-group">
+                  <div class="mf-lbl">Số lượng BTC</div>
+                  <input
+                    class="mf-inp"
+                    type="number"
+                    id="mn-amt"
+                    placeholder="0.00000"
+                    oninput="mnGenSig()"
+                  />
+                </div>
+                <div class="mf-group">
+                  <div class="mf-lbl">Phí BTC</div>
+                  <input
+                    class="mf-inp"
+                    type="text"
+                    id="mn-fee"
+                    value="0.0005"
+                    readonly
+                    style="color: var(--txt2)"
+                  />
+                </div>
+              </div>
+              <div class="mf-group" id="mn-to-group" style="display: none">
+                <div class="mf-lbl">Địa chỉ nhận</div>
+                <input
+                  class="mf-inp"
+                  type="text"
+                  id="mn-to"
+                  placeholder="0x..."
+                  oninput="mnGenSig()"
+                />
+              </div>
+              <div class="mf-group">
+                <div class="mf-lbl">Chữ ký SHA-256</div>
+                <div class="sig-box" id="mn-sig">Nhập thông tin...</div>
+              </div>
+              <button class="btn-mn-tx" onclick="mnSubmitTx()">
+                + VÀO MEMPOOL
+              </button>
+            </div>
+          </div>
+        </div>
+        <!-- /mn-layout -->
+      </div>
+      <!-- /view-miner -->
+
+      <!-- Footer stats -->
+      <div class="stats-footer">
+        <div class="sf-item">
+          <div class="sf-lbl">BTC/USDT</div>
+          <div class="sf-val g" id="sf-price">$67,420.82</div>
+        </div>
+        <div class="sf-div"></div>
+        <div class="sf-item">
+          <div class="sf-lbl">MEMPOOL</div>
+          <div class="sf-val y" id="sf-mempool">0 TX</div>
+        </div>
+        <div class="sf-div"></div>
+        <div class="sf-item">
+          <div class="sf-lbl">CHAIN HEIGHT</div>
+          <div class="sf-val mg" id="sf-height">3</div>
+        </div>
+        <div class="sf-div"></div>
+        <div class="sf-item">
+          <div class="sf-lbl">BLOCK REWARD</div>
+          <div class="sf-val">3.125 BTC</div>
+        </div>
+        <div class="sf-div"></div>
+        <div class="sf-item">
+          <div class="sf-lbl">NETWORK</div>
+          <div class="sf-val mg">2,847 NODES</div>
+        </div>
+        <div class="sf-div"></div>
+        <div class="sf-item" style="margin-left: auto">
+          <div class="sf-lbl">SESSION REWARD</div>
+          <div class="sf-val y" id="sf-reward">0 BTC</div>
+        </div>
+      </div>
+
+      <!-- Toast -->
+      <div class="toast" id="toast"></div>
+
+      <script>
+        // ═══════════════════════════════════════════════════════════
+        // SHARED STATE — The bridge between Exchange and Miner
+        // ═══════════════════════════════════════════════════════════
+        const SharedState = {
+          mempool: [], // ← ALL pending TXs live here
+          blockchain: [], // ← confirmed blocks
+          balances: { btc: 0.842, usdt: 12450.0 },
+          currentPrice: 67420.82,
+          openOrders: [],
+          sessionBlocks: 0,
+          sessionReward: 0,
+          totalHashes: 0,
+          listeners: [], // callback registry for reactivity
+
+          // Notify all listeners when state changes
+          emit(event, data) {
+            this.listeners.forEach((fn) => fn(event, data));
+          },
+
+          addTx(tx) {
+            this.mempool.push(tx);
+            this.emit("mempool:add", tx);
+          },
+
+          removeTxs(ids) {
+            this.mempool = this.mempool.filter((t) => !ids.includes(t.id));
+            this.emit("mempool:remove", ids);
+          },
+
+          addBlock(block) {
+            this.blockchain.push(block);
+            this.emit("blockchain:add", block);
+          },
+        };
+
+        // ── Real SHA-256 via Web Crypto API ──
+        async function sha256(str) {
+          const buf = new TextEncoder().encode(str);
+          const hash = await crypto.subtle.digest("SHA-256", buf);
+          return Array.from(new Uint8Array(hash))
+            .map((b) => b.toString(16).padStart(2, "0"))
+            .join("");
+        }
+
+        // Fast sync hash for mining loop (deterministic approximation)
+        function fastHash(str) {
+          let h = 2166136261 >>> 0;
+          for (let i = 0; i < str.length; i++) {
+            h ^= str.charCodeAt(i);
+            h = Math.imul(h, 16777619) >>> 0;
+          }
+          let r = "";
+          let s = h;
+          for (let i = 0; i < 8; i++) {
+            s = (Math.imul(s, 1664525) + 1013904223) >>> 0;
+            r += s.toString(16).padStart(8, "0");
+          }
+          return r;
+        }
+
+        function txId() {
+          return "TX" + Math.random().toString(36).substr(2, 8).toUpperCase();
+        }
+
+        const MINER_FULL = "0x4F3A9c28B2Cd12E8F56b3A91B2c8D45E7F9a3B2C";
+        const MINER_SHORT = "0x4F3A...8B2C";
+        const BLOCK_REWARD = 3.125;
+        const DIFFICULTY = 4;
+        const DIFFICULTY_PREFIX = "0".repeat(DIFFICULTY);
+
+        // ═══════════════════════════════════════════════════════════
+        // INIT BLOCKCHAIN WITH SEED DATA
+        // ═══════════════════════════════════════════════════════════
+        async function init() {
+          // Genesis
+          const genesis = {
+            index: 0,
+            timestamp: Date.now() - 86400000 * 7,
+            transactions: [
+              {
+                id: txId(),
+                type: "reward",
+                from: "SYSTEM",
+                to: MINER_FULL,
+                amount: 3.125,
+                fee: 0,
+                note: "Genesis",
+              },
+            ],
+            previousHash: "0".repeat(64),
+            nonce: 48291,
+            hash: "",
+            miner: MINER_SHORT,
+            merkleRoot: "",
+            fromExchange: [],
+          };
+          genesis.merkleRoot = await computeMerkleRoot(genesis.transactions);
+          genesis.hash = await computeBlockHash(genesis);
+          SharedState.blockchain.push(genesis);
+
+          // 2 historical blocks with exchange-like TXs
+          const histData = [
+            [
+              {
+                id: txId(),
+                type: "buy",
+                from: MINER_FULL,
+                to: "EXCHANGE",
+                amount: 0.5,
+                fee: 0.0005,
+                price: 65200,
+                note: "Buy BTC",
+                fromExchange: true,
+              },
+            ],
+            [
+              {
+                id: txId(),
+                type: "buy",
+                from: MINER_FULL,
+                to: "EXCHANGE",
+                amount: 0.2,
+                fee: 0.0005,
+                price: 66500,
+                note: "Buy BTC",
+                fromExchange: true,
+              },
+              {
+                id: txId(),
+                type: "send",
+                from: MINER_FULL,
+                to: "0xA2B3...C4D5",
+                amount: 0.1,
+                fee: 0.0003,
+                note: "Transfer",
+                fromExchange: false,
+              },
+              {
+                id: txId(),
+                type: "reward",
+                from: "SYSTEM",
+                to: MINER_FULL,
+                amount: 3.125,
+                fee: 0,
+                note: "Block Reward",
+                fromExchange: false,
+              },
+            ],
+          ];
+
+          for (let i = 0; i < histData.length; i++) {
+            const prev =
+              SharedState.blockchain[SharedState.blockchain.length - 1];
+            const b = {
+              index: prev.index + 1,
+              timestamp: Date.now() - (2 - i) * 3600000,
+              transactions: histData[i],
+              previousHash: prev.hash,
+              nonce: Math.floor(Math.random() * 400000) + 5000,
+              hash: "",
+              miner: MINER_SHORT,
+              merkleRoot: "",
+              fromExchange: histData[i]
+                .filter((t) => t.fromExchange)
+                .map((t) => t.id),
+            };
+            b.merkleRoot = await computeMerkleRoot(b.transactions);
+            b.hash = await computeBlockHash(b);
+            SharedState.blockchain.push(b);
+          }
+
+          // Seed mempool with a few waiting TXs
+          const seedTxs = [
+            {
+              type: "buy",
+              from: "0xB2C3...D4E5",
+              to: "EXCHANGE",
+              amount: 0.32,
+              fee: 0.0012,
+              price: 67400,
+              note: "Buy BTC",
+              fromExchange: false,
+            },
+            {
+              type: "send",
+              from: "0xC3D4...E5F6",
+              to: "0xA1B2...C3D4",
+              amount: 0.08,
+              fee: 0.0006,
+              note: "Transfer",
+              fromExchange: false,
+            },
+            {
+              type: "buy",
+              from: "0xD4E5...F6G7",
+              to: "EXCHANGE",
+              amount: 0.15,
+              fee: 0.0008,
+              price: 67350,
+              note: "Buy BTC",
+              fromExchange: false,
+            },
+          ];
+          seedTxs.forEach((s) =>
+            SharedState.addTx({
+              id: txId(),
+              ...s,
+              timestamp: Date.now() - Math.random() * 120000,
+              selected: false,
+            }),
+          );
+
+          // Wire up reactivity
+          SharedState.listeners.push((event, data) => {
+            if (event === "mempool:add" || event === "mempool:remove") {
+              renderMpList();
+              updatePipeCount();
+              updateMemStats();
+            }
+            if (event === "blockchain:add") {
+              renderChain();
+              updateChainStats();
+            }
+          });
+
+          renderAll();
+          startLivePriceTick();
+          startAutoMpRefill();
+        }
+
+        async function computeBlockHash(b) {
+          const d = JSON.stringify({
+            index: b.index,
+            timestamp: b.timestamp,
+            merkleRoot: b.merkleRoot,
+            previousHash: b.previousHash,
+            nonce: b.nonce,
+          });
+          return sha256(d);
+        }
+
+        async function computeMerkleRoot(txs) {
+          if (!txs.length) return "0".repeat(64);
+          let h = await Promise.all(txs.map((t) => sha256(JSON.stringify(t))));
+          while (h.length > 1) {
+            if (h.length % 2) h.push(h[h.length - 1]);
+            const n = [];
+            for (let i = 0; i < h.length; i += 2)
+              n.push(await sha256(h[i] + h[i + 1]));
+            h = n;
+          }
+          return h[0];
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // VIEW SWITCHING
+        // ═══════════════════════════════════════════════════════════
+        let currentView = "exchange";
+
+        function switchView(view) {
+          currentView = view;
+          document
+            .getElementById("view-exchange")
+            .classList.toggle("active", view === "exchange");
+          document
+            .getElementById("view-miner")
+            .classList.toggle("active", view === "miner");
+          const te = document.getElementById("tab-exchange");
+          const tm = document.getElementById("tab-miner");
+          te.className =
+            "view-tab" + (view === "exchange" ? " active-exchange" : "");
+          tm.className = "view-tab" + (view === "miner" ? " active-miner" : "");
+          if (view === "miner") {
+            renderMpList();
+            renderChain();
+          }
+          if (view === "exchange") {
+            renderExPairs();
+            setTimeout(setupChart, 50);
+          }
+        }
+
+        function updatePipeCount() {
+          const n = SharedState.mempool.length;
+          const el = document.getElementById("pipe-count");
+          el.textContent = n;
+          el.className = "pipe-count" + (n > 0 ? "" : " zero");
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // EXCHANGE VIEW
+        // ═══════════════════════════════════════════════════════════
+        const PAIRS = [
+          {
+            sym: "BTC",
+            quote: "USDT",
+            price: 67420.82,
+            chg: +2.46,
+            vol: "1.92B",
+          },
+          {
+            sym: "ETH",
+            quote: "USDT",
+            price: 3891.44,
+            chg: +1.73,
+            vol: "842M",
+          },
+          { sym: "BNB", quote: "USDT", price: 594.2, chg: +0.88, vol: "214M" },
+          { sym: "SOL", quote: "USDT", price: 178.6, chg: +3.21, vol: "512M" },
+          { sym: "XRP", quote: "USDT", price: 0.5834, chg: -0.42, vol: "182M" },
+          { sym: "ADA", quote: "USDT", price: 0.461, chg: -1.14, vol: "89M" },
+          {
+            sym: "DOGE",
+            quote: "USDT",
+            price: 0.1728,
+            chg: +5.44,
+            vol: "340M",
+          },
+          {
+            sym: "MATIC",
+            quote: "USDT",
+            price: 0.8402,
+            chg: -0.33,
+            vol: "67M",
+          },
+        ];
+
+        function renderExPairs() {
+          const el = document.getElementById("ex-pairs-list");
+          el.innerHTML = PAIRS.map(
+            (p, i) => `
+    <div class="prow ${i === 0 ? "on" : ""}" onclick="this.parentElement.querySelectorAll('.prow').forEach(r=>r.classList.remove('on'));this.classList.add('on')">
+      <div><div class="pr-n">${p.sym}/${p.quote}</div><div class="pr-b">${p.vol}</div></div>
+      <div class="pr-p">${p.price >= 1000 ? p.price.toLocaleString() : p.price.toFixed(4)}</div>
+      <div class="pr-c ${p.chg >= 0 ? "up" : "dn"}">${p.chg >= 0 ? "+" : ""}${p.chg.toFixed(2)}%</div>
+    </div>`,
+          ).join("");
+        }
+
+        let exSide = "buy";
+        function exSwitchSide(s) {
+          exSide = s;
+          document.getElementById("ex-tab-buy").className =
+            "bstab buy" + (s === "buy" ? "" : " off");
+          document.getElementById("ex-tab-sell").className =
+            "bstab sell" + (s === "sell" ? "" : " off");
+          const btn = document.getElementById("ex-btn-place");
+          btn.className = "btn-place " + s;
+          btn.childNodes[0].textContent = s === "buy" ? "Mua BTC" : "Bán BTC";
+          document.getElementById("ex-avail-num").textContent =
+            s === "buy"
+              ? SharedState.balances.usdt.toFixed(2)
+              : SharedState.balances.btc.toFixed(5);
+          document.getElementById("ex-avail-unit").textContent =
+            s === "buy" ? "USDT" : "BTC";
+          exCalcTotal();
+        }
+
+        function exAdjPrice(d) {
+          const inp = document.getElementById("ex-price-inp");
+          inp.value = (parseFloat(inp.value) || SharedState.currentPrice) + d;
+          exCalcTotal();
+        }
+
+        function exSetPct(pct, btn) {
+          document
+            .querySelectorAll(".pct-b")
+            .forEach((b) => b.classList.remove("on"));
+          btn.classList.add("on");
+          const price =
+            parseFloat(document.getElementById("ex-price-inp").value) ||
+            SharedState.currentPrice;
+          const bal =
+            exSide === "buy"
+              ? SharedState.balances.usdt
+              : SharedState.balances.btc;
+          const amt =
+            exSide === "buy" ? (bal * pct) / 100 / price : (bal * pct) / 100;
+          document.getElementById("ex-amount-inp").value = amt.toFixed(5);
+          exCalcTotal();
+        }
+
+        function exCalcTotal() {
+          const price =
+            parseFloat(document.getElementById("ex-price-inp").value) || 0;
+          const amt =
+            parseFloat(document.getElementById("ex-amount-inp").value) || 0;
+          const total = price * amt,
+            fee = total * 0.001;
+          document.getElementById("ex-total-inp").value =
+            total > 0 ? total.toFixed(2) : "";
+          document.getElementById("ex-fee").textContent =
+            fee.toFixed(4) + " USDT";
+          document.getElementById("ex-total-pay").textContent =
+            (total + fee).toFixed(2) + " USDT";
+        }
+
+        function exCalcFromTotal() {
+          const price =
+            parseFloat(document.getElementById("ex-price-inp").value) || 0;
+          const total =
+            parseFloat(document.getElementById("ex-total-inp").value) || 0;
+          if (price > 0)
+            document.getElementById("ex-amount-inp").value = (
+              total / price
+            ).toFixed(5);
+          exCalcTotal();
+        }
+
+        async function exPlaceOrder() {
+          const price =
+            parseFloat(document.getElementById("ex-price-inp").value) || 0;
+          const amount =
+            parseFloat(document.getElementById("ex-amount-inp").value) || 0;
+          if (!amount || amount <= 0) {
+            showToast("⚠ Nhập số lượng BTC!", true);
+            return;
+          }
+
+          const cost = price * amount;
+          if (exSide === "buy" && cost > SharedState.balances.usdt) {
+            showToast("⚠ Không đủ USDT!", true);
+            return;
+          }
+          if (exSide === "sell" && amount > SharedState.balances.btc) {
+            showToast("⚠ Không đủ BTC!", true);
+            return;
+          }
+
+          // Build TX
+          const tx = {
+            id: txId(),
+            type: exSide === "buy" ? "buy" : "send",
+            from: MINER_FULL,
+            to:
+              exSide === "buy"
+                ? "EXCHANGE"
+                : document.getElementById("ex-price-inp").value,
+            amount,
+            price,
+            fee: 0.0005,
+            note: exSide === "buy" ? "Buy BTC (Exchange)" : "Sell BTC",
+            timestamp: Date.now(),
+            selected: false,
+            fromExchange: true, // ← FLAG: came from Exchange view
+            source: "EXCHANGE",
+          };
+
+          // Sign with real SHA-256
+          tx.signature = await sha256(JSON.stringify({ ...tx }));
+
+          // Update balances
+          if (exSide === "buy") {
+            SharedState.balances.usdt -= cost + cost * 0.001;
+            SharedState.balances.btc += amount;
+          } else {
+            SharedState.balances.btc -= amount + 0.0005;
+            SharedState.balances.usdt += cost * 0.999;
+          }
+
+          // Update open orders
+          const now = new Date();
+          SharedState.openOrders.push({
+            time: now.toLocaleTimeString("vi"),
+            pair: "BTC/USDT",
+            type: "Giới hạn",
+            side: exSide,
+            price: price.toFixed(2),
+            amount: amount.toFixed(5),
+            filled: "0%",
+            id: tx.id,
+          });
+
+          // ★★★ SEND TO TX SELECTION PANEL → User picks which TXs enter block ★★★
+          ExchangeTxQueue.add(tx);
+
+          // Reset form
+          document.getElementById("ex-amount-inp").value = "";
+          document.getElementById("ex-total-inp").value = "";
+          exCalcTotal();
+          updateExBalances();
+          renderOpenOrders();
+
+          // Show connection banner
+          showTxBanner(tx);
+          showToast(
+            `✅ Lệnh ${tx.id} → "Lựa chọn giao dịch"!\n→ Chuyển sang "Miner Dashboard" để chọn và đào.`,
+          );
+
+          // Animate pipe count
+          const pc = document.getElementById("pipe-count");
+          pc.style.transform = "scale(1.4)";
+          setTimeout(() => (pc.style.transform = ""), 300);
+        }
+
+        function showTxBanner(tx) {
+          const b = document.getElementById("tx-banner");
+          b.textContent = `✅ TX ${tx.id} (${tx.amount} BTC) → Đã vào "Lựa chọn giao dịch"!  Miner Dashboard → Tick chọn → Thêm vào Block.`;
+          b.style.display = "flex";
+          clearTimeout(b._t);
+          b._t = setTimeout(() => (b.style.display = "none"), 5500);
+        }
+
+        function updateExBalances() {
+          document.getElementById("ex-bal-btc").textContent =
+            SharedState.balances.btc.toFixed(5);
+          document.getElementById("ex-bal-usdt").textContent =
+            SharedState.balances.usdt.toFixed(2);
+          document.getElementById("ex-bal-btc-usd").textContent =
+            "≈ $" +
+            (SharedState.balances.btc * SharedState.currentPrice)
+              .toFixed(0)
+              .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+          document.getElementById("ex-total-asset").textContent =
+            (
+              SharedState.balances.btc +
+              SharedState.balances.usdt / SharedState.currentPrice
+            ).toFixed(5) + " BTC";
+          document.getElementById("ex-avail-num").textContent =
+            exSide === "buy"
+              ? SharedState.balances.usdt.toFixed(2)
+              : SharedState.balances.btc.toFixed(5);
+          // Sync miner sidebar too
+          document.getElementById("mn-bal-btc").textContent =
+            SharedState.balances.btc.toFixed(5) + " BTC";
+          document.getElementById("mn-bal-btc-usd").textContent =
+            "≈ $" +
+            (SharedState.balances.btc * SharedState.currentPrice).toFixed(0);
+          document.getElementById("mn-bal-usdt").textContent =
+            SharedState.balances.usdt.toFixed(2) + " USDT";
+        }
+
+        function renderOpenOrders() {
+          const count = SharedState.openOrders.length;
+          document.getElementById("ex-open-count").textContent = count;
+          document.getElementById("ex-open-count2").textContent = count;
+          document.getElementById("ex-no-orders").style.display = count
+            ? "none"
+            : "block";
+          document.getElementById("ex-empty-orders").style.display = count
+            ? "none"
+            : "flex";
+          // Remove old rows
+          document.querySelectorAll(".otbl-row").forEach((r) => r.remove());
+          const tbl = document.querySelector(".orders-tbl");
+          SharedState.openOrders.forEach((o, i) => {
+            const row = document.createElement("div");
+            row.className = "otbl-row";
+            row.innerHTML = `<span style="color:var(--txt2);font-family:var(--m)">${o.time}</span><span>${o.pair}</span><span style="color:var(--txt2)">${o.type}</span><span class="os-${o.side}">${o.side === "buy" ? "Mua" : "Bán"}</span><span style="font-family:var(--m)">${parseFloat(o.price).toLocaleString()}</span><span style="font-family:var(--m);color:var(--txt2)">${o.amount}</span><span style="font-family:var(--m);color:var(--txt3)">Chờ đào...</span><span class="cancel-link" onclick="cancelOrder(${i})">Hủy</span>`;
+            tbl.appendChild(row);
+          });
+        }
+
+        function cancelOrder(i) {
+          const o = SharedState.openOrders[i];
+          SharedState.openOrders.splice(i, 1);
+          SharedState.mempool = SharedState.mempool.filter(
+            (t) => t.id !== o.id,
+          );
+          ExchangeTxQueue.remove([o.id]);
+          SharedState.emit("mempool:remove", [o.id]);
+          renderOpenOrders();
+          showToast("Đã hủy lệnh " + o.id, "info");
+        }
+
+        // ── Candlestick Chart ──
+        let candles = genCandles(100);
+        function genCandles(n) {
+          let p = 66000;
+          const out = [];
+          for (let i = 0; i < n; i++) {
+            const o = p,
+              move = (Math.random() - 0.47) * 380,
+              c = o + move;
+            out.push({
+              open: o,
+              close: c,
+              high: Math.max(o, c) + Math.random() * 180,
+              low: Math.min(o, c) - Math.random() * 180,
+              vol: Math.random() * 200 + 40,
+            });
+            p = c;
+          }
+          return out;
+        }
+
+        function setupChart() {
+          const canvas = document.getElementById("exchart");
+          const area = canvas.parentElement;
+          const DPR = devicePixelRatio || 1;
+          canvas.width = area.clientWidth * DPR;
+          canvas.height = area.clientHeight * DPR;
+          canvas.style.width = area.clientWidth + "px";
+          canvas.style.height = area.clientHeight + "px";
+          const ctx = canvas.getContext("2d");
+          ctx.scale(DPR, DPR);
+          drawChart(ctx, area.clientWidth, area.clientHeight);
+        }
+
+        function drawChart(ctx, W, H) {
+          if (!W || !H) return;
+          ctx.clearRect(0, 0, W, H);
+          const pL = 8,
+            pR = 55,
+            pT = 12,
+            pB = 38,
+            volH = 45;
+          const cH = H - pT - pB - volH,
+            cW = W - pL - pR;
+          const prices = candles.flatMap((c) => [c.high, c.low]);
+          const minP = Math.min(...prices) - 150,
+            maxP = Math.max(...prices) + 150,
+            rng = maxP - minP;
+          const cW2 = Math.max(2, Math.floor(cW / candles.length) - 1),
+            gap = Math.floor(cW / candles.length);
+          const maxVol = Math.max(...candles.map((c) => c.vol));
+
+          // Grid
+          ctx.strokeStyle = "rgba(255,255,255,0.04)";
+          ctx.lineWidth = 1;
+          for (let i = 0; i <= 5; i++) {
+            const y = pT + (cH / 5) * i;
+            ctx.beginPath();
+            ctx.moveTo(pL, y);
+            ctx.lineTo(W - pR, y);
+            ctx.stroke();
+            ctx.fillStyle = "#3d5566";
+            ctx.font = "9px IBM Plex Mono";
+            ctx.textAlign = "left";
+            ctx.fillText((maxP - (rng / 5) * i).toFixed(0), W - pR + 4, y + 3);
+          }
+
+          // Volume
+          candles.forEach((c, i) => {
+            const x = pL + i * gap,
+              vH = (c.vol / maxVol) * volH;
+            ctx.fillStyle =
+              c.close >= c.open ? "rgba(14,203,129,.2)" : "rgba(246,70,93,.2)";
+            ctx.fillRect(x, H - pB - vH, cW2, vH);
+          });
+
+          // Candles
+          candles.forEach((c, i) => {
+            const x = pL + i * gap,
+              isG = c.close >= c.open,
+              col = isG ? "#0ecb81" : "#f6465d";
+            const yH = pT + ((maxP - c.high) / rng) * cH,
+              yL = pT + ((maxP - c.low) / rng) * cH;
+            const yO = pT + ((maxP - c.open) / rng) * cH,
+              yC = pT + ((maxP - c.close) / rng) * cH;
+            ctx.strokeStyle = col;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(x + cW2 / 2, yH);
+            ctx.lineTo(x + cW2 / 2, yL);
+            ctx.stroke();
+            ctx.fillStyle = col;
+            ctx.fillRect(
+              x,
+              Math.min(yO, yC),
+              cW2,
+              Math.max(1, Math.abs(yO - yC)),
+            );
+          });
+
+          // Price line
+          const last = candles[candles.length - 1];
+          const py = pT + ((maxP - last.close) / rng) * cH;
+          ctx.setLineDash([4, 3]);
+          ctx.strokeStyle = "#0ecb81";
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(pL, py);
+          ctx.lineTo(W - pR, py);
+          ctx.stroke();
+          ctx.setLineDash([]);
+          ctx.fillStyle = "#0ecb81";
+          ctx.fillRect(W - pR, py - 8, pR, 16);
+          ctx.fillStyle = "#000";
+          ctx.font = "bold 8px IBM Plex Mono";
+          ctx.textAlign = "center";
+          ctx.fillText(last.close.toFixed(0), W - pR / 2, py + 3);
+        }
+
+        // Recent trades
+        let tradesFeed = [];
+        function addTrade() {
+          const isBuy = Math.random() > 0.5,
+            p = SharedState.currentPrice + (Math.random() - 0.5) * 15;
+          const qty = (Math.random() * 0.4 + 0.001).toFixed(4),
+            now = new Date();
+          tradesFeed.unshift({
+            p: p.toFixed(2),
+            q: qty,
+            t: `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}:${String(now.getSeconds()).padStart(2, "0")}`,
+            isBuy,
+          });
+          if (tradesFeed.length > 25) tradesFeed.pop();
+          const el = document.getElementById("ex-trades");
+          el.innerHTML = tradesFeed
+            .map(
+              (t) =>
+                `<div class="trow"><span class="tp ${t.isBuy ? "buy" : "sell"}">${parseFloat(t.p).toLocaleString("en-US", { minimumFractionDigits: 2 })}</span><span class="tq">${t.q}</span><span class="tt">${t.t}</span></div>`,
+            )
+            .join("");
+        }
+
+        // Order book
+        function renderOrderBook() {
+          const p = SharedState.currentPrice;
+          let aH = "",
+            bH = "";
+          for (let i = 12; i >= 1; i--) {
+            const price = p + i * 11 + Math.random() * 5,
+              qty = (Math.random() * 1.5 + 0.02).toFixed(4),
+              w = Math.random() * 60 + 8;
+            aH += `<div class="brow ask"><div class="brow-bg" style="width:${w}%"></div><span class="brow-price">${price.toFixed(2)}</span><span class="brow-qty">${qty}</span><span class="brow-total">${(price * parseFloat(qty)).toFixed(0)}</span></div>`;
+          }
+          for (let i = 1; i <= 12; i++) {
+            const price = p - i * 10 - Math.random() * 4,
+              qty = (Math.random() * 1.5 + 0.02).toFixed(4),
+              w = Math.random() * 60 + 8;
+            bH += `<div class="brow bid"><div class="brow-bg" style="width:${w}%"></div><span class="brow-price">${price.toFixed(2)}</span><span class="brow-qty">${qty}</span><span class="brow-total">${(price * parseFloat(qty)).toFixed(0)}</span></div>`;
+          }
+          document.getElementById("book-asks").innerHTML = aH;
+          document.getElementById("book-bids").innerHTML = bH;
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // MINER VIEW
+        // ═══════════════════════════════════════════════════════════
+        function renderMpList() {
+          const el = document.getElementById("mn-mp-list");
+          const count = SharedState.mempool.length;
+          document.getElementById("mn-mp-count").textContent = count;
+          document.getElementById("sf-mempool").textContent = count + " TX";
+
+          el.innerHTML = SharedState.mempool
+            .map((tx) => {
+              const fromEx = tx.fromExchange;
+              return `<div class="mp-item ${tx.selected ? "sel" : ""}" onclick="mnToggleTx('${tx.id}')">
+      <div>
+        <div class="mpi-id">${tx.id}${fromEx ? `<span class="from-exchange-tag">FROM EXCHANGE</span>` : ""}</div>
+        <div class="mpi-from">${(tx.from || "").substr(0, 16)}...</div>
+      </div>
+      <div style="text-align:right">
+        <div class="mpi-fee">${tx.fee} BTC</div>
+        <div class="mpi-amt">${tx.amount} BTC</div>
+      </div>
+      <div class="mpi-type ${tx.type}">${tx.type.toUpperCase()}</div>
+    </div>`;
+            })
+            .join("");
+
+          updateBpInfo();
+          updateMerkleTree();
+        }
+
+        function mnToggleTx(id) {
+          const tx = SharedState.mempool.find((t) => t.id === id);
+          if (tx) {
+            tx.selected = !tx.selected;
+            renderMpList();
+            updateMerkleTree();
+          }
+        }
+
+        function selectAllMp() {
+          SharedState.mempool.forEach((t) => (t.selected = true));
+          renderMpList();
+          updateMerkleTree();
+        }
+
+        function updateBpInfo() {
+          const sel = SharedState.mempool.filter((t) => t.selected);
+          document.getElementById("bp-txcount").textContent =
+            sel.length + " TX";
+          const last =
+            SharedState.blockchain[SharedState.blockchain.length - 1];
+          document.getElementById("bp-prevhash").textContent = last
+            ? last.hash.substr(0, 28) + "..."
+            : "...";
+          document.getElementById("bp-num").textContent =
+            SharedState.blockchain.length;
+        }
+
+        function updateMemStats() {
+          const n = SharedState.mempool.length;
+          document.getElementById("sf-mempool").textContent = n + " TX";
+          document.getElementById("pipe-count").textContent = n;
+          document.getElementById("pipe-count").className =
+            "pipe-count" + (n > 0 ? "" : " zero");
+        }
+
+        async function updateMerkleTree() {
+          const el = document.getElementById("mn-merkle");
+          const rootEl = document.getElementById("mk-root-display");
+
+          // Lấy TẤT CẢ TX đang chờ vào block (từ mempool đã selected + ExchangeTxQueue đã chọn)
+          const blockTxs = SharedState.mempool.filter((t) => t.selected);
+
+          if (!blockTxs.length) {
+            el.innerHTML =
+              '<div style="font-family:var(--m);font-size:9px;color:var(--txt3);text-align:center;padding:16px 8px">⬡<br><br>Chưa có TX nào trong block.<br>Thêm giao dịch vào block để<br>tính Merkle Tree tự động.</div>';
+            if (rootEl) rootEl.textContent = "N/A";
+            return;
+          }
+
+          // Hiệu ứng computing
+          el.classList.add("computing");
+
+          // Thêm coinbase TX (reward) vào đầu như thực tế
+          const coinbaseMock = {
+            id: "COINBASE",
+            type: "reward",
+            from: "SYSTEM",
+            to: MINER_SHORT,
+            amount: BLOCK_REWARD,
+          };
+          const allTxs = [coinbaseMock, ...blockTxs];
+
+          // Tính hash lá
+          const leaves = await Promise.all(
+            allTxs.map((t) => sha256(JSON.stringify(t))),
+          );
+          let lvl = [...leaves],
+            levels = [[...leaves]];
+          while (lvl.length > 1) {
+            if (lvl.length % 2) lvl.push(lvl[lvl.length - 1]);
+            const nxt = [];
+            for (let i = 0; i < lvl.length; i += 2)
+              nxt.push(await sha256(lvl[i] + lvl[i + 1]));
+            lvl = nxt;
+            levels.push([...nxt]);
+          }
+
+          const root = levels[levels.length - 1][0];
+          if (rootEl) rootEl.textContent = root.substr(0, 16) + "...";
+
+          // Vẽ cây từ trên xuống: ROOT → BRANCH → LEAF
+          let html = "";
+
+          // ROOT
+          html += `<div class="mk-level">
+    <div class="mk-node root">
+      <span class="mk-lbl">MERKLE ROOT</span>
+      ${root.substr(0, 14)}...
+    </div>
+  </div>`;
+
+          // Các level trung gian (bỏ level lá và root)
+          for (let l = levels.length - 2; l >= 1; l--) {
+            html += '<div class="mk-level">';
+            const shown = levels[l].slice(0, 4);
+            shown.forEach((h) => {
+              html += `<div class="mk-node branch"><span class="mk-lbl">BRANCH</span>${h.substr(0, 10)}...</div>`;
+            });
+            if (levels[l].length > 4) {
+              html += `<div class="mk-node" style="border:1px dashed var(--line);color:var(--txt3);font-size:8px">+${levels[l].length - 4}</div>`;
+            }
+            html += "</div>";
+          }
+
+          // LEAVES — mỗi lá ứng với 1 TX thật
+          html += '<div class="mk-level">';
+          allTxs.slice(0, 5).forEach((tx, i) => {
+            const isCoinbase = tx.type === "reward";
+            const color = isCoinbase
+              ? "var(--y)"
+              : tx.type === "buy"
+                ? "var(--g)"
+                : "var(--b)";
+            const label = isCoinbase ? "COINBASE" : tx.id.substr(0, 8);
+            html += `<div class="mk-node leaf" style="border-color:${color};color:${color}">
+      <span class="mk-lbl">LEAF</span>${label}
+    </div>`;
+          });
+          if (allTxs.length > 5) {
+            html += `<div class="mk-node" style="border:1px dashed var(--line);color:var(--txt3);font-size:8px">+${allTxs.length - 5} TX</div>`;
+          }
+          html += "</div>";
+
+          // TX count info
+          html += `<div style="font-family:var(--m);font-size:8px;color:var(--txt3);text-align:center;margin-top:6px;padding-top:6px;border-top:1px solid var(--line)">
+    ${allTxs.length} TX · ${leaves.length} lá · ${levels.length} tầng
+  </div>`;
+
+          el.innerHTML = html;
+          el.classList.remove("computing");
+        }
+
+        // ── Mining ──
+        let isMining = false,
+          miningNonce = 0,
+          miningHashes = 0,
+          miningStart = 0,
+          miningTimer = null,
+          pendingBlock = null;
+
+        async function startMining() {
+          if (isMining) return;
+          const sel = SharedState.mempool.filter((t) => t.selected);
+          if (!sel.length) {
+            showToast("⚠ Chọn ít nhất 1 TX từ Mempool!", true);
+            return;
+          }
+
+          isMining = true;
+          miningNonce = 0;
+          miningHashes = 0;
+          miningStart = Date.now();
+          SharedState.totalHashes = SharedState.totalHashes || 0;
+
+          document.getElementById("btn-mine").classList.add("mining");
+          document.getElementById("btn-mine").textContent = "⛏ ĐANG ĐÀO...";
+          document.getElementById("btn-stop").style.display = "block";
+          document.getElementById("eng-status").textContent = "⚡ MINING...";
+          document.getElementById("eng-status").style.color = "var(--y)";
+          document.getElementById("sec-pow").textContent = "MINING";
+
+          const prev =
+            SharedState.blockchain[SharedState.blockchain.length - 1];
+          const coinbase = {
+            id: txId(),
+            type: "reward",
+            from: "SYSTEM",
+            to: MINER_FULL,
+            amount: BLOCK_REWARD,
+            fee: 0,
+            note: "Block Reward",
+            fromExchange: false,
+          };
+          const allTxs = [coinbase, ...sel];
+          const merkleRoot = await computeMerkleRoot(allTxs);
+
+          pendingBlock = {
+            index: SharedState.blockchain.length,
+            timestamp: Date.now(),
+            transactions: allTxs,
+            previousHash: prev.hash,
+            merkleRoot,
+            nonce: 0,
+            hash: "",
+            miner: MINER_SHORT,
+            fromExchange: sel.filter((t) => t.fromExchange).map((t) => t.id),
+          };
+
+          miningTimer = setInterval(() => {
+            const e = (Date.now() - miningStart) / 1000;
+            document.getElementById("mm-time").textContent = e.toFixed(1) + "s";
+          }, 100);
+
+          runMining();
+        }
+
+        function runMining() {
+          if (!isMining) return;
+          const BATCH = 300;
+          for (let i = 0; i < BATCH; i++) {
+            pendingBlock.nonce = miningNonce;
+            const d = JSON.stringify({
+              index: pendingBlock.index,
+              timestamp: pendingBlock.timestamp,
+              merkleRoot: pendingBlock.merkleRoot,
+              previousHash: pendingBlock.previousHash,
+              nonce: miningNonce,
+            });
+            const hash = fastHash(d);
+            miningNonce++;
+            miningHashes++;
+            SharedState.totalHashes++;
+
+            if (miningHashes % 80 === 0) {
+              document.getElementById("bp-nonce").textContent =
+                miningNonce.toLocaleString();
+              document.getElementById("mn-attempts").textContent =
+                miningHashes.toLocaleString() + " attempts";
+              const spd = Math.floor(
+                miningHashes / ((Date.now() - miningStart) / 1000),
+              );
+              document.getElementById("mn-speed").textContent =
+                (spd / 1000).toFixed(1) + " KH/s";
+              document.getElementById("mm-total").textContent =
+                SharedState.totalHashes.toLocaleString();
+              document.getElementById("mn-progress").style.width =
+                Math.min(95, (miningNonce / 80000) * 100) + "%";
+              renderHashOut(hash);
+            }
+
+            if (hash.startsWith(DIFFICULTY_PREFIX)) {
+              pendingBlock.hash = hash;
+              finalizeBlock();
+              return;
+            }
+          }
+          if (isMining) setTimeout(runMining, 0);
+        }
+
+        function renderHashOut(hash) {
+          const el = document.getElementById("mn-hash-out");
+          const z = hash.split("").findIndex((c) => c !== "0");
+          if (z <= 0) el.innerHTML = `<span class="hr">${hash}</span>`;
+          else
+            el.innerHTML = `<span class="hz">${hash.substr(0, z)}</span><span class="hr">${hash.substr(z)}</span>`;
+        }
+
+        async function finalizeBlock() {
+          clearInterval(miningTimer);
+          isMining = false;
+          const realHash = await computeBlockHash(pendingBlock);
+          pendingBlock.hash = realHash;
+
+          // Remove selected TXs from mempool
+          const selIds = pendingBlock.transactions
+            .filter((t) => t.type !== "reward")
+            .map((t) => t.id);
+          SharedState.removeTxs(selIds);
+
+          // Add to blockchain
+          SharedState.addBlock(pendingBlock);
+          SharedState.sessionBlocks++;
+          SharedState.sessionReward += BLOCK_REWARD;
+
+          // Update balances (miner gets reward)
+          SharedState.balances.btc += BLOCK_REWARD;
+
+          // Update open orders — mark as confirmed
+          selIds.forEach((id) => {
+            const o = SharedState.openOrders.find((o) => o.id === id);
+            if (o) o.filled = "100%";
+          });
+
+          // Reset UI
+          document.getElementById("mn-progress").style.width = "100%";
+          document.getElementById("mn-progress").style.background = "var(--mg)";
+          renderHashOut(pendingBlock.hash);
+
+          const btnM = document.getElementById("btn-mine");
+          btnM.classList.remove("mining");
+          btnM.textContent = "✓ FOUND! ⛏ ĐÀO TIẾP";
+          document.getElementById("btn-stop").style.display = "none";
+          document.getElementById("eng-status").textContent = "✓ BLOCK FOUND!";
+          document.getElementById("eng-status").style.color = "var(--mg)";
+          document.getElementById("sec-pow").textContent = "CONFIRMED";
+
+          document.getElementById("mn-blocks-mined").textContent =
+            parseInt(document.getElementById("mn-blocks-mined").textContent) +
+            1;
+          document.getElementById("mm-session").textContent =
+            SharedState.sessionBlocks;
+          document.getElementById("mm-reward").textContent =
+            (SharedState.sessionBlocks * BLOCK_REWARD).toFixed(3) + " BTC";
+          document.getElementById("sf-reward").textContent =
+            (SharedState.sessionBlocks * BLOCK_REWARD).toFixed(3) + " BTC";
+
+          updateExBalances();
+          renderOpenOrders();
+
+          // Count how many from exchange
+          const fromExCount = pendingBlock.fromExchange.length;
+          const exMsg =
+            fromExCount > 0
+              ? `\n📦 Bao gồm ${fromExCount} lệnh từ Exchange!`
+              : "";
+          showToast(
+            `✅ Block #${pendingBlock.index} đã được đào!\nNonce: ${pendingBlock.nonce.toLocaleString()} · Reward: ${BLOCK_REWARD} BTC${exMsg}`,
+          );
+
+          setTimeout(() => {
+            document.getElementById("mn-progress").style.width = "0%";
+            document.getElementById("mn-progress").style.background =
+              "linear-gradient(90deg,var(--mg),#00ffaa)";
+            btnM.textContent = "⛏ BẮT ĐẦU ĐÀO";
+            btnM.disabled = false;
+            document.getElementById("eng-status").textContent = "READY";
+            document.getElementById("eng-status").style.color = "var(--txt2)";
+            document.getElementById("sec-pow").textContent = "READY";
+          }, 3000);
+        }
+
+        function stopMining() {
+          isMining = false;
+          clearInterval(miningTimer);
+          document.getElementById("btn-mine").classList.remove("mining");
+          document.getElementById("btn-mine").textContent = "⛏ BẮT ĐẦU ĐÀO";
+          document.getElementById("btn-stop").style.display = "none";
+          document.getElementById("eng-status").textContent = "STOPPED";
+          document.getElementById("eng-status").style.color = "var(--r)";
+          document.getElementById("mn-progress").style.width = "0%";
+        }
+
+        // Blockchain renderer
+        function renderChain() {
+          const c = document.getElementById("chain-container");
+          const blocks = [...SharedState.blockchain].reverse();
+          let html = "";
+          blocks.forEach((b, i) => {
+            const isGenesis = b.index === 0,
+              isNew = i === 0 && SharedState.sessionBlocks > 0;
+            const exTxCount = (b.fromExchange || []).length;
+            html += `
+    <div class="bk-card ${isGenesis ? "genesis" : ""} ${isNew ? "newest" : ""}" id="bkc-${b.index}">
+      <div class="bk-header" onclick="toggleBk(${b.index})">
+        <div class="bkh-left">
+          <div class="bk-num ${isGenesis ? "gen" : ""}">BLOCK #${b.index}</div>
+          ${isGenesis ? '<span class="bk-badge bb-genesis">GENESIS</span>' : ""}
+          ${isNew ? '<span class="bk-badge bb-new">NEW ✓</span>' : ""}
+          ${exTxCount > 0 ? `<span class="bk-badge" style="background:var(--yd);color:var(--y);border:1px solid rgba(240,185,11,.3)">📦 ${exTxCount} FROM EXCHANGE</span>` : ""}
+        </div>
+        <div style="display:flex;gap:10px;align-items:center">
+          <span class="bk-meta">${new Date(b.timestamp).toLocaleTimeString("vi")}</span>
+          <span class="bk-tx-count">${b.transactions.length} TX</span>
+          <svg width="9" height="9" viewBox="0 0 9 9" fill="var(--txt3)"><path d="M1.5 3l3 3 3-3"/></svg>
+        </div>
+      </div>
+      <div class="bk-body" id="bkb-${b.index}">
+        <div class="bk-f" style="grid-column:span 2"><div class="bk-fl">Hash (SHA-256)</div><div class="bk-fv hash">${b.hash}</div></div>
+        <div class="bk-f" style="grid-column:span 2"><div class="bk-fl">Previous Hash</div><div class="bk-fv" style="color:var(--txt3);font-size:8px">${b.previousHash.substr(0, 48)}...</div></div>
+        <div class="bk-f"><div class="bk-fl">Merkle Root</div><div class="bk-fv blue" style="font-size:8px">${b.merkleRoot.substr(0, 20)}...</div></div>
+        <div class="bk-f"><div class="bk-fl">Nonce</div><div class="bk-fv green">${b.nonce.toLocaleString()}</div></div>
+        <div class="bk-f"><div class="bk-fl">Miner</div><div class="bk-fv" style="color:var(--y)">${b.miner}</div></div>
+        <div class="bk-f"><div class="bk-fl">Trạng thái</div><div class="bk-fv green">✓ CONFIRMED</div></div>
+      </div>
+      <div class="bk-txs" id="bkt-${b.index}">
+        <div class="bk-tx-toggle" id="bktt-${b.index}" onclick="toggleBkTx(${b.index})">
+          <svg viewBox="0 0 9 9" fill="var(--txt3)"><path d="M1.5 3l3 3 3-3"/></svg>
+          GIAO DỊCH (${b.transactions.length})
+        </div>
+        <div class="bk-tx-rows" id="bktr-${b.index}">
+          <div class="bk-tx-hdr"><span>TX ID</span><span>Địa chỉ</span><span>BTC</span><span>Loại</span></div>
+          ${b.transactions
+            .map(
+              (tx) => `
+          <div class="bk-tx-row ${(b.fromExchange || []).includes(tx.id) ? "from-ex" : ""}">
+            <span class="btxr-id">${tx.id}</span>
+            <span class="btxr-addr">${(tx.from || "").substr(0, 12)}...</span>
+            <span class="btxr-amt">${tx.amount}</span>
+            <span class="btxr-type ${tx.type}">${tx.type.toUpperCase()}</span>
+          </div>`,
+            )
+            .join("")}
+        </div>
+      </div>
+    </div>
+    ${i < blocks.length - 1 ? `<div class="chain-link"><div class="cl-line"></div><div class="cl-lbl">↑ prevHash</div><div class="cl-line"></div></div>` : ""}
+    `;
+          });
+          c.innerHTML = html;
+          // Auto-open latest block
+          if (blocks.length > 0) toggleBk(blocks[0].index);
+          updateChainStats();
+        }
+
+        function toggleBk(idx) {
+          const b = document.getElementById("bkb-" + idx),
+            t = document.getElementById("bkt-" + idx);
+          if (!b) return;
+          const open = b.classList.toggle("open");
+          if (t) t.classList.toggle("open", open);
+        }
+
+        function toggleBkTx(idx) {
+          const rows = document.getElementById("bktr-" + idx),
+            toggle = document.getElementById("bktt-" + idx);
+          if (!rows) return;
+          const open = rows.classList.toggle("open");
+          toggle.classList.toggle("open", open);
+        }
+
+        function updateChainStats() {
+          const h = SharedState.blockchain.length;
+          document.getElementById("ci-count").textContent = h + " blocks";
+          document.getElementById("sf-height").textContent = h - 1;
+          document.getElementById("hdr-blocks").textContent = h + " blocks";
+          const last =
+            SharedState.blockchain[SharedState.blockchain.length - 1];
+          if (last)
+            document.getElementById("ci-hash").textContent =
+              "Latest: " + last.hash.substr(0, 14) + "...";
+        }
+
+        // ── Miner quick-add TX ──
+        function mnUpdateForm() {
+          const t = document.getElementById("mn-tx-type").value;
+          document.getElementById("mn-to-group").style.display =
+            t === "send" ? "block" : "none";
+          mnGenSig();
+        }
+
+        async function mnGenSig() {
+          const t = document.getElementById("mn-tx-type").value;
+          const amt = document.getElementById("mn-amt").value || "?";
+          const to =
+            t === "send"
+              ? document.getElementById("mn-to").value || "?"
+              : "EXCHANGE";
+          const data = `${t.toUpperCase()}:${amt}BTC:${MINER_FULL}:${to}:${Date.now()}`;
+          const h = await sha256(data);
+          document.getElementById("mn-sig").textContent = h;
+        }
+
+        async function mnSubmitTx() {
+          const t = document.getElementById("mn-tx-type").value;
+          const amt = parseFloat(document.getElementById("mn-amt").value);
+          if (!amt || amt <= 0) {
+            showToast("⚠ Nhập số lượng!", true);
+            return;
+          }
+          const tx = {
+            id: txId(),
+            type: t,
+            from: MINER_FULL,
+            to:
+              t === "send"
+                ? document.getElementById("mn-to").value || "???"
+                : "EXCHANGE",
+            amount: amt,
+            fee: 0.0005,
+            note: t === "buy" ? "Buy BTC" : "Transfer",
+            timestamp: Date.now(),
+            selected: false,
+            fromExchange: false,
+          };
+          tx.signature = await sha256(JSON.stringify(tx));
+          SharedState.addTx(tx);
+          document.getElementById("mn-amt").value = "";
+          document.getElementById("mn-sig").textContent =
+            "Giao dịch đã được ký!";
+          showToast(`✅ TX ${tx.id} đã vào Mempool!`);
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // TX SELECTION PANEL — Exchange TXs waiting to enter block
+        // Max 5 TX per block
+        // ═══════════════════════════════════════════════════════════
+        const MAX_BLOCK_TX = 5;
+
+        const ExchangeTxQueue = {
+          items: [],
+          add(tx) {
+            this.items.push({ ...tx, blockSelected: false });
+            renderTxSelectPanel();
+          },
+          remove(ids) {
+            this.items = this.items.filter((t) => !ids.includes(t.id));
+            renderTxSelectPanel();
+          },
+          getSelected() {
+            return this.items.filter((t) => t.blockSelected);
+          },
+          countSelected() {
+            return this.items.filter((t) => t.blockSelected).length;
+          },
+        };
+
+        function renderTxSelectPanel() {
+          const list = document.getElementById("tx-select-list");
+          const empty = document.getElementById("tx-select-empty");
+          const footer = document.getElementById("tx-select-footer");
+          const counter = document.getElementById("tx-slot-counter");
+          const usedEl = document.getElementById("tx-slot-used");
+          const addBtn = document.getElementById("btn-add-to-block");
+
+          const items = ExchangeTxQueue.items;
+          const selCount = ExchangeTxQueue.countSelected();
+          const isFull = selCount >= MAX_BLOCK_TX;
+
+          usedEl.textContent = selCount;
+          counter.className = "tx-slot-counter" + (isFull ? " full" : "");
+
+          for (let i = 0; i < MAX_BLOCK_TX; i++) {
+            const bar = document.getElementById("tsb-" + i);
+            if (!bar) continue;
+            bar.className =
+              "tx-slot-bar" +
+              (i < selCount ? " filled" + (isFull ? " full" : "") : "");
+          }
+
+          if (!items.length) {
+            empty.style.display = "block";
+            list.innerHTML = "";
+            footer.style.display = "none";
+            return;
+          }
+
+          empty.style.display = "none";
+          footer.style.display = "flex";
+          addBtn.disabled = selCount === 0;
+
+          list.innerHTML = items
+            .map((tx) => {
+              const checked = tx.blockSelected;
+              const disabled = !checked && isFull;
+              const typeLabel =
+                tx.type === "buy"
+                  ? "MUA"
+                  : tx.type === "sell"
+                    ? "BAN"
+                    : tx.type.toUpperCase();
+              const time = new Date(tx.timestamp).toLocaleTimeString("vi");
+              const safeId = tx.id.replace(/'/g, "");
+              const cls =
+                "tx-sel-item" +
+                (checked ? " checked" : "") +
+                (disabled ? " disabled" : "");
+              const from = (tx.from || "").substr(0, 14);
+              return `<div class="${cls}" onclick="txSelToggle('${safeId}')">
+      <div class="tx-sel-checkbox">
+        <svg viewBox="0 0 9 9" fill="none" stroke="#000" stroke-width="2"><polyline points="1.5,4.5 3.5,7 7.5,2"/></svg>
+      </div>
+      <div class="tx-sel-info">
+        <div class="tx-sel-id">${tx.id}</div>
+        <div class="tx-sel-meta">${from}... · ${time}</div>
+      </div>
+      <div class="tx-sel-right">
+        <div class="tx-sel-amt">${tx.amount} BTC</div>
+        <span class="tx-sel-type ${tx.type}">${typeLabel}</span>
+      </div>
+    </div>`;
+            })
+            .join("");
+        }
+
+        function txSelToggle(id) {
+          const tx = ExchangeTxQueue.items.find((t) => t.id === id);
+          if (!tx) return;
+          const selCount = ExchangeTxQueue.countSelected();
+          if (!tx.blockSelected && selCount >= MAX_BLOCK_TX) {
+            showToast("⚠ Moi block chi chua toi da 5 giao dich!", true);
+            return;
+          }
+          tx.blockSelected = !tx.blockSelected;
+          renderTxSelectPanel();
+        }
+
+        function txSelClearAll() {
+          ExchangeTxQueue.items.forEach((t) => (t.blockSelected = false));
+          renderTxSelectPanel();
+        }
+
+        function txSelAddToBlock() {
+          const sel = ExchangeTxQueue.getSelected();
+          if (!sel.length) {
+            showToast("⚠ Chua chon giao dich nao!", true);
+            return;
+          }
+          sel.forEach((tx) => {
+            const mpTx = { ...tx, selected: true, fromExchange: true };
+            SharedState.mempool.push(mpTx);
+          });
+          SharedState.emit("mempool:add", sel[0]);
+          ExchangeTxQueue.remove(sel.map((t) => t.id));
+          showToast(
+            "✅ Da them " +
+              sel.length +
+              " giao dich vao block! Nhan BAT DAU DAO de dao ngay.",
+          );
+          const btnMine = document.getElementById("btn-mine");
+          btnMine.style.boxShadow = "0 0 20px var(--mglow)";
+          setTimeout(() => (btnMine.style.boxShadow = ""), 3000);
+          updateBpInfo();
+          updateMerkleTree();
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // LOGIN FLOW — DID Authentication (4 steps)
+        // ═══════════════════════════════════════════════════════════
+        let loginStep = 0;
+        let loginUserDID = "";
+
+        function lGoStep(n) {
+          document
+            .getElementById("lstep" + loginStep)
+            .classList.remove("active");
+          document
+            .getElementById("ldot" + loginStep)
+            .classList.remove("active");
+          if (n > loginStep)
+            document.getElementById("ldot" + loginStep).classList.add("done");
+          else
+            document
+              .getElementById("ldot" + loginStep)
+              .classList.remove("done");
+          loginStep = n;
+          document.getElementById("lstep" + loginStep).classList.add("active");
+          document.getElementById("ldot" + loginStep).classList.add("active");
+          for (let i = n + 1; i < 4; i++) {
+            document
+              .getElementById("ldot" + i)
+              .classList.remove("active", "done");
+          }
+        }
+
+        function lShowStatus(step, msg, type) {
+          const el = document.getElementById("lstat" + step);
+          el.textContent = msg;
+          el.className = "ls-status " + type;
+        }
+
+        function lSetLoad(id, on) {
+          document.getElementById("lload" + id).className =
+            "ls-loading" + (on ? " on" : "");
+        }
+
+        function lStep0Next() {
+          const did = document.getElementById("lDIDInput").value.trim();
+          if (!did.startsWith("did:")) {
+            lShowStatus(
+              0,
+              '✗ DID không hợp lệ. Phải bắt đầu bằng "did:"',
+              "error",
+            );
+            return;
+          }
+          loginUserDID = did;
+          lSetLoad(0, true);
+          lShowStatus(0, "⟳ Đang kiểm tra DID format...", "info");
+          setTimeout(() => {
+            lSetLoad(0, false);
+            lGoStep(1);
+            lFetchDIDDoc();
+          }, 1200);
+        }
+
+        function lFetchDIDDoc() {
+          lSetLoad(1, true);
+          const doc = document.getElementById("lDIDDoc");
+          doc.textContent = "Đang truy vấn blockchain...";
+          setTimeout(() => {
+            lSetLoad(1, false);
+            doc.textContent =
+              '{\n  "@context": "https://w3id.org/did/v1",\n  "id": "' +
+              loginUserDID +
+              '",\n  "verificationMethod": [{\n    "id": "' +
+              loginUserDID +
+              '#keys-1",\n    "type": "Ed25519VerificationKey2020",\n    "publicKeyMultibase": "z6Mkf5rGMoatr…"\n  }]\n}';
+            lShowStatus(
+              1,
+              "✓ DID Document tìm thấy trên Polygon #819042",
+              "success",
+            );
+            const ch =
+              "CH_" + Math.random().toString(36).substring(2, 18).toUpperCase();
+            document.getElementById("lChallengeVal").textContent = ch;
+            document.getElementById("lSigInput").value =
+              "sig_" + Math.random().toString(36).substring(2, 34);
+          }, 1800);
+        }
+
+        function lStep1Next() {
+          lGoStep(2);
+        }
+
+        function lStep2Next() {
+          const sig = document.getElementById("lSigInput").value.trim();
+          if (!sig) {
+            lShowStatus(2, "✗ Vui lòng nhập chữ ký (signature)", "error");
+            return;
+          }
+          lSetLoad(2, true);
+          lShowStatus(
+            2,
+            "⟳ Đang gửi DID + Signature lên blockchain...",
+            "info",
+          );
+          setTimeout(() => {
+            lSetLoad(2, false);
+            lGoStep(3);
+            lVerifyStep3();
+          }, 1000);
+        }
+
+        function lVerifyStep3() {
+          const steps = [
+            {
+              msg: "⟳ Truy xuất Verifiable Credential từ blockchain...",
+              type: "info",
+              delay: 900,
+            },
+            {
+              msg: "⟳ Xác minh chữ ký với Public Key...",
+              type: "info",
+              delay: 1900,
+            },
+            {
+              msg: "⟳ Kiểm tra Credential chưa bị thu hồi...",
+              type: "info",
+              delay: 3000,
+            },
+            {
+              msg: "✓ Danh tính đã được xác minh thành công!",
+              type: "success",
+              delay: 4000,
+            },
+          ];
+          steps.forEach((s) =>
+            setTimeout(() => lShowStatus(3, s.msg, s.type), s.delay),
+          );
+          setTimeout(() => {
+            lSetLoad(3, false);
+            document.getElementById("lEnterBtn").style.display = "block";
+          }, 4300);
+        }
+
+        function lEnterApp() {
+          // Random Vietnamese name
+          const vietNames = [
+            "Nguyễn Minh Khoa",
+            "Trần Thị Lan",
+            "Lê Văn Hùng",
+            "Phạm Thị Hương",
+            "Hoàng Minh Tuấn",
+            "Vũ Thị Mai",
+            "Đặng Văn Đức",
+            "Bùi Thị Ngọc",
+            "Ngô Minh Tâm",
+            "Đinh Thị Hoa",
+            "Lý Văn Nam",
+            "Phan Thị Thu",
+          ];
+          const randomName =
+            vietNames[Math.floor(Math.random() * vietNames.length)];
+          const initials = randomName.split(" ").slice(-1)[0].charAt(0); // lấy chữ cái đầu tên
+
+          // Hide login screen, show app
+          document.getElementById("loginScreen").classList.add("hidden");
+          document.getElementById("mainApp").style.display = "flex";
+          setTimeout(setupChart, 50);
+
+          // Update DID chip — chỉ hiện tên, không còn clickable
+          document.getElementById("did-av").textContent = initials;
+          document.getElementById("did-name").textContent = randomName;
+          document.getElementById("did-addr").textContent =
+            loginUserDID.substring(0, 20) + "...";
+          document.getElementById("did-verified").style.display = "block";
+
+          showToast("✅ Chào mừng " + randomName + "! DID đã xác minh.");
+        }
+
+        // openDIDModal disabled — chip không còn clickable
+        function openDIDModal() {
+          /* disabled */
+        }
+
+        // ── Price tick ──
+        function startLivePriceTick() {
+          const exChart = document.getElementById("exchart");
+          const ctx = exChart.getContext("2d");
+
+          setInterval(() => {
+            SharedState.currentPrice += (Math.random() - 0.49) * 75;
+            const p = SharedState.currentPrice.toFixed(2);
+            const fmt = parseFloat(p).toLocaleString("en-US", {
+              minimumFractionDigits: 2,
+            });
+            document.getElementById("ex-price").textContent = fmt;
+            document.getElementById("spread-p").textContent = fmt;
+            document.getElementById("sf-price").textContent = "$" + fmt;
+            document.getElementById("ex-price-inp").value =
+              parseFloat(p).toFixed(2);
+
+            const last = candles[candles.length - 1];
+            last.close = SharedState.currentPrice;
+            last.high = Math.max(last.high, last.close);
+            last.low = Math.min(last.low, last.close);
+            if (Math.random() > 0.94) {
+              candles.push({
+                open: last.close,
+                close: last.close,
+                high: last.close,
+                low: last.close,
+                vol: Math.random() * 150 + 30,
+              });
+              if (candles.length > 120) candles.shift();
+            }
+
+            const W = parseInt(exChart.style.width),
+              H = parseInt(exChart.style.height);
+            drawChart(ctx, W, H);
+            renderOrderBook();
+            addTrade();
+            updateExBalances();
+          }, 900);
+        }
+
+        function startAutoMpRefill() {
+          setInterval(() => {
+            if (SharedState.mempool.length < 12 && Math.random() > 0.65) {
+              const types = ["buy", "send"];
+              const t = types[Math.floor(Math.random() * types.length)];
+              SharedState.addTx({
+                id: txId(),
+                type: t,
+                from:
+                  "0x" +
+                  Math.random().toString(16).substr(2, 4).toUpperCase() +
+                  "...XXXX",
+                to: t === "send" ? "0xAABB...CCDD" : "EXCHANGE",
+                amount: +(Math.random() * 0.4 + 0.001).toFixed(5),
+                fee: +(Math.random() * 0.001 + 0.0001).toFixed(4),
+                timestamp: Date.now(),
+                selected: false,
+                fromExchange: false,
+                note: t === "buy" ? "Buy BTC" : "Transfer",
+              });
+            }
+          }, 5000);
+        }
+
+        // ── Init all ──
+        function renderAll() {
+          renderExPairs();
+          renderMpList();
+          renderChain();
+          renderOrderBook();
+          updatePipeCount();
+          updateMemStats();
+          updateChainStats();
+          updateExBalances();
+          renderTxSelectPanel();
+          for (let i = 0; i < 15; i++) addTrade();
+          setTimeout(setupChart, 80);
+          window.addEventListener("resize", () => setTimeout(setupChart, 50));
+          document.getElementById("ex-price-inp").value =
+            SharedState.currentPrice.toFixed(2);
+          document.querySelectorAll(".otab").forEach((t) =>
+            t.addEventListener("click", function () {
+              document
+                .querySelectorAll(".otab")
+                .forEach((x) => x.classList.remove("on"));
+              this.classList.add("on");
+            }),
+          );
+          document.querySelectorAll(".ept").forEach((t) =>
+            t.addEventListener("click", function () {
+              document
+                .querySelectorAll(".ept")
+                .forEach((x) => x.classList.remove("on"));
+              this.classList.add("on");
+            }),
+          );
+          document.querySelectorAll(".ebtab").forEach((t) =>
+            t.addEventListener("click", function () {
+              document
+                .querySelectorAll(".ebtab")
+                .forEach((x) => x.classList.remove("on"));
+              this.classList.add("on");
+            }),
+          );
+          document.querySelectorAll(".tb-btn").forEach((t) =>
+            t.addEventListener("click", function () {
+              const tfs = ["1m", "5m", "15m", "1h", "4h", "1D"];
+              if (tfs.includes(this.textContent.trim())) {
+                document.querySelectorAll(".tb-btn").forEach((x) => {
+                  if (tfs.includes(x.textContent.trim()))
+                    x.classList.remove("on");
+                });
+                this.classList.add("on");
+                candles = genCandles(100);
+              }
+            }),
+          );
+        }
+
+        function showToast(msg, type = false) {
+          const t = document.getElementById("toast");
+          t.textContent = msg;
+          t.className =
+            "toast show" + (type ? " err" : type === "info" ? " info" : "");
+          clearTimeout(t._t);
+          t._t = setTimeout(() => t.classList.remove("show"), 5000);
+        }
+
+        init();
+      </script>
+    </div>
+    <!-- /mainApp -->
+  </body>
+</html>
